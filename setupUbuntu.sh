@@ -17,6 +17,7 @@ DOCKER=1
 VIVADO=1
 PrusaSlicer=1
 ARDUINO=1
+OBSIDIAN=1
 
 work_dir="$HOME/Downloads/setupWork"
 custom_install_dir="/home/$USER/tools"
@@ -127,7 +128,7 @@ install_custom_app  $work_dir "prusasclic3r" $PrusaSlicer "$HOME/tools/prusa" >>
 #Arduino
 install_custom_app  $work_dir "arduino" $ARDUINO "$HOME/tools/arduino" >> ./logs/arduino.txt & pids+=($!)
 #obsidian
-
+install_custom_app  $work_dir "obsidian" $OBSIDIAN "$HOME/tools/obsidian" >> ./logs/obsidian.txt & pids+=($!)
 
 ##########################################
 ###CUSTOMIZE THE OS
