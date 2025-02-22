@@ -26,7 +26,7 @@ pids=()
 #create the default folders so they belong to the user
 mkdir -p "$work_dir"
 mkdir -p "$custom_install_dir"
-mkdir .p "$HOME/git"
+mkdir -p "$HOME/git"
 mkdir -p "$HOME/svn"
 
 # I need curl for all the background downloads to work so install it first:
