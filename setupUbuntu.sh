@@ -156,9 +156,13 @@ set_custom_keybinding "custom3" "Nautilus" "nautilus" "<Super>x"
 set_custom_keybinding "custom4" "Set Monitors" "/home/$USER/Nextcloud/Documents/Projekte/LinuxSetup/Setup/monitors/hdmi-mirror.sh" "<Super>d"
 #set the grub default timeout to something reasonable and hide it:
 sudo sed -i -e 's/GRUB_TIMEOUT=10/GRUB_TIMEOUT=1\n#/g' /etc/default/grub
+#If on the arm add the cutmem. But this should already be done whilst in the live session.
+if [ "$(uname -m)" = "aarch64" ]; then
+    sudo sed -i -e 's/GRUB_CMDLINE_LINUX=""/GRUB_CMDLINE_LINUX="cutmem 0x8800000000 0x8fffffffff"#/g' /etc/default/grub
+fi
 echo "GRUB_HIDDEN_TIMEOUT_QUIET=1" | sudo tee -a /etc/default/grub
 echo "GRUB_HIDDEN_TIMEOUT_QUIET=true" | sudo tee -a /etc/default/grub
-update-grub
+sudo update-grub
 #add aliases and Paths to the bashrc
 echo "alias gg='git gui'" | tee -a ~/.bashrc
 echo "export LM_LICENSE_FILE=\"$custom_install_dir/lscc/diamond/3.13/license:\$LM_LICENSE_FILE\"" | tee -a ~/.bashrc
