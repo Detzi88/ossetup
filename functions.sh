@@ -35,25 +35,6 @@ create_symlinks() {
     echo "$(dirname "$libncursesw_path")/libncursesw.so.5 -> $libncursesw_path"
 }
 
-install_deb_package() {
-    # Check if the URL is provided
-    if [ -z "$1" ]; then
-        echo "Usage: install_deb_package <download_link>"
-        return 1
-    fi
-    # Assign the first argument to a variable
-    local download_link=$1
-    # Define the file name for the downloaded package
-    local file_name="package.deb"
-    # Download the file
-    curl -o "$file_name" -L "$download_link"
-    # Install the downloaded package
-    sudo apt install -y ./"$file_name"
-    # Remove the downloaded .deb file
-    rm "$file_name"
-    echo "Installation completed and $file_name file removed."
-}
-
 install_wine_package() {
     # Check if the URL and bottle name are provided
     if [ -z "$1" ] || [ -z "$2" ]; then
@@ -84,10 +65,6 @@ install_wine_package() {
     rm "./$file_name"
 
     echo "Installation completed and $file_name removed."
-}
-
-log_and_install() {
-    echo "installing $1" >>log.txt && sudo apt install "$1" -y
 }
 
 set_custom_keybinding() {
@@ -127,19 +104,78 @@ set_custom_keybinding() {
 }
 
 install_custom_app() {
-	if [ "$#" -ne 3 ]; then
-        	echo "Usage: install_custom_app <name 'string'> <install '0/1'> <work_dir 'Path'>"
-        	echo "Example: my_function virtualbox 1 \$workdir"
+	if [ "$#" -ne 3 || "$#" -gt 3 ]; then
+        	echo "Usage: install_custom_app <work_dir 'Path'> <name 'string'> <install '0/1'> optional: <target 'Path'>"
+        	echo "Example: install_custom_app \$workdir virtualbox 1 /home/me/tools"
         	return 1
    	fi
-	local NAME="$1"
-	local INSTALL="$2"
-    	local work_dir="$3"
-    	
+   	local work_dir="$1"
+	local NAME="$2"
+	local INSTALL="$3"
+	local target_path="$4"
+	
+	if [ -z "$target_path" ]; then
+	    target_path="$HOME/tools/unknown"
+	fi
+
 	if [[ "$INSTALL" == "1" && -f ./apps/$NAME.sh ]]; then
 	    echo "Installing $NAME."
-	    ./apps/$NAME.sh $work_dir
+	    ./apps/$NAME.sh $work_dir $target_path
 	else
 	    echo "$NAME is not selected, or ./apps/$NAME.sh does not exist - skipping."
 	fi
+}
+
+# Define the lock files
+LOCK_FILES=(
+    "/var/lib/dpkg/lock"
+    "/var/cache/apt/archives/lock"
+    "/var/lib/apt/lists/lock"
+)
+
+# Function to check if any apt lock file exists
+wait_for_apt_lock() {
+    while true; do
+        lock_found=0
+        for lock_file in "${LOCK_FILES[@]}"; do
+            if [ -e "$lock_file" ]; then
+                lock_found=1
+                echo "Lock file $lock_file found. Waiting..."
+                break
+            fi
+        done
+        
+        # If lock files were found, sleep and check again
+        if [ "$lock_found" -eq 1 ]; then
+            sleep 1
+        else
+            echo "No lock file found. Proceeding."
+            break
+        fi
+    done
+}
+
+log_and_install() {
+    wait_for_apt_lock
+    echo "installing $1" >>log.txt && sudo apt install "$1" -y
+}
+
+install_deb_package() {
+    # Check if the URL is provided
+    if [ -z "$1" ]; then
+        echo "Usage: install_deb_package <download_link>"
+        return 1
+    fi
+    # Assign the first argument to a variable
+    local download_link=$1
+    # Define the file name for the downloaded package
+    local file_name="package.deb"
+    # Download the file
+    curl -o "$file_name" -L "$download_link"
+    # Install the downloaded package
+    wait_for_apt_lock
+    sudo apt install -y ./"$file_name"
+    # Remove the downloaded .deb file
+    rm "$file_name"
+    echo "Installation completed and $file_name file removed."
 }
