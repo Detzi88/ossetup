@@ -179,6 +179,7 @@ sudo apt update #update the package lists
 sudo apt upgrade -y #install updates
 sudo apt remove nvidia* -y
 sudo apt autoremove -y
+echo "Installing missing drivers:"
 sudo ubuntu-drivers autoinstall #install missing drivers
 for app in "${applications[@]}"; do
     log_and_install "$app"
