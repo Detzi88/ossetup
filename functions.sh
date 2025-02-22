@@ -128,7 +128,7 @@ install_custom_app() {
 
 	if [[ "$INSTALL" == "1" && -f ./apps/$NAME.sh ]]; then
 	    ./apps/$NAME.sh $work_dir $target_path
-	    echo "Installing ${CYAN}$NAME${RESETCOLOR} ${GREEN}done${RESETCOLOR}."
+	    echo -e "Installing ${CYAN}$NAME${RESETCOLOR} ${GREEN}done${RESETCOLOR}."
 	else
 	    echo -e "${YELLOW}Skipping${RESETCOLOR} ${CYAN}${NAME}${RESETCOLOR}.It is either not selected, or ./apps/$NAME.sh does not exist ."
 	fi
@@ -141,7 +141,6 @@ LOCK_FILES=(
 
 # Function to check if any apt lock file exists
 wait_for_apt_lock() {
-    break
     while true; do
         lock_found=0
         for lock_file in "${LOCK_FILES[@]}"; do
