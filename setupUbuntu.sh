@@ -3,7 +3,7 @@
 #./setupUbuntu.sh
 ######################################
 . ./functions.sh
-reboot_required=true  # or false, depending on your condition
+reboot_required=false  # or false, depending on your condition
 QUARTUS=1
 WINE=1
 STEAM=1
@@ -12,7 +12,7 @@ LTspice=1
 VBOX=1
 DSView=1
 CODE=1
-MINICONDA=1
+MINICONDA=0
 DOCKER=1
 VIVADO=1
 PrusaSlicer=1
@@ -126,6 +126,7 @@ install_custom_app  $work_dir "vivado" $VIVADO "$HOME/tools/xilinx" >> ./logs/vi
 install_custom_app  $work_dir "prusasclic3r" $PrusaSlicer "$HOME/tools/prusa" >> ./logs/prusasclic3r.txt & pids+=($!)
 #Arduino
 install_custom_app  $work_dir "arduino" $ARDUINO "$HOME/tools/arduino" >> ./logs/arduino.txt & pids+=($!)
+#obsidian
 
 
 ##########################################
@@ -186,8 +187,8 @@ sudo ubuntu-drivers autoinstall #install missing drivers
 for app in "${applications[@]}"; do
     log_and_install "$app"
 done
-#obsidian
-install_deb_package https://github.com/obsidianmd/obsidian-releases/releases/download/v1.8.7/obsidian_1.8.7_amd64.deb
+
+
 #remove the speech dispatcher (audio crackling issue)
 sudo apt remove speech-dispatcher -y
 sudo systemctl disable speech-dispatcherd

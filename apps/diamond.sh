@@ -2,6 +2,11 @@
 . ../functions.sh
 workdir="$1"
 install_dir="$2"
+#Aarch64 is not supported
+if [ "$(uname -m)" = "aarch64" ]; then
+    echo "No installation candidatest for aarch64"
+    exit 1
+fi
 #Put this into the same path as the downloaded .rpm file.
 #adjust the two following parameters as needed:
 # Define install path
