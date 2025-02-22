@@ -1,3 +1,11 @@
+# Define color variables
+RED="\e[31m"
+GREEN="\e[32m"
+YELLOW="\e[33m"
+BLUE="\e[34m"
+MAGENTA="\e[35m"
+CYAN="\e[36m"
+RESETCOLOR="\e[0m"   # Resets text color
 check_ubuntu_version() {
     local version
     version=$(lsb_release -r | awk '{print $2}')
@@ -120,9 +128,9 @@ install_custom_app() {
 
 	if [[ "$INSTALL" == "1" && -f ./apps/$NAME.sh ]]; then
 	    echo "Installing $NAME."
-	    ./apps/$NAME.sh $work_dir $target_path
+	    ./apps/$NAME.sh $work_dir $target_path\e[33mT
 	else
-	    echo "$NAME is not selected, or ./apps/$NAME.sh does not exist - skipping."
+	    echo "$NAME is not selected, or ./apps/$NAME.sh does not exist -$YELLOW skipping$RESETCOLOR."
 	fi
 }
 
@@ -140,7 +148,7 @@ wait_for_apt_lock() {
         for lock_file in "${LOCK_FILES[@]}"; do
             if [ -e "$lock_file" ]; then
                 lock_found=1
-                echo "Lock file $lock_file found. Waiting..."
+                echo "Lock file $lock_file found. ${YELLOW}waiting${RESETCOLOR}..."
                 break
             fi
         done
