@@ -164,7 +164,8 @@ wait_for_apt_lock() {
 
 log_and_install() {
     wait_for_apt_lock
-    echo "installing $1" >>log.txt && sudo apt install "$1" -y
+    mkdir -p ./logs
+    echo "installing $1" >>log.txt && sudo apt install "$1" -y >>./logs/$1.txt
 }
 
 install_deb_package() {

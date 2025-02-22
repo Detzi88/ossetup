@@ -4,19 +4,19 @@
 ######################################
 . ./functions.sh
 reboot_required=true  # or false, depending on your condition
-QUARTUS=0
-WINE=0
-STEAM=0
-DIAMOND=0
-LTspice=0
-VBOX=0
-DSView=0
-CODE=0
-MINICONDA=0
-DOCKER=0
-VIVADO=0
-PrusaSlicer=0
-ARDUINO=0
+QUARTUS=1
+WINE=1
+STEAM=1
+DIAMOND=1
+LTspice=1
+VBOX=1
+DSView=1
+CODE=1
+MINICONDA=1
+DOCKER=1
+VIVADO=1
+PrusaSlicer=1
+ARDUINO=1
 
 work_dir="$HOME/Downloads/setupWork"
 custom_install_dir="/home/$USER/tools"
@@ -28,6 +28,7 @@ mkdir -p "$work_dir"
 mkdir -p "$custom_install_dir"
 mkdir -p "$HOME/git"
 mkdir -p "$HOME/svn"
+mkdir -p ./logs
 
 # I need curl for all the background downloads to work so install it first:
 sudo apt install curl -y
@@ -98,32 +99,33 @@ applications=(  "build-essential"
                 "tftp"
 )
 
+
 #Quartus
-install_custom_app  $work_dir "quartus" $QUARTUS $custom_install_dir/intel & pids+=($!)
+install_custom_app  $work_dir "quartus" "$QUARTUS $custom_install_dir/intel" >> ./logs/quartus.txt & pids+=($!)
 #Wine
-install_custom_app "$work_dir" "wine" $WINE "$custom_install_dir/wine" & pids+=($!)
+install_custom_app "$work_dir" "wine" $WINE "$custom_install_dir/wine" >> ./logs/wine.txt & pids+=($!)
 #steam 
-install_custom_app $work_dir "steam" $STEAM "$custom_install_dir/steam" & pids+=($!)
+install_custom_app $work_dir "steam" $STEAM "$custom_install_dir/steam" >> ./logs/steam.txt & pids+=($!)
 #Lattice diamond
-install_custom_app $work_dir "diamond" $DIAMOND "$HOME/tools/lscc" & pids+=($!)
+install_custom_app $work_dir "diamond" $DIAMOND "$HOME/tools/lscc" >> ./logs/diamond.txt & pids+=($!)
 #LTspiceXVII
-install_custom_app $work_dir "LTspice" $LTspice "$HOME/tools/LTspiceXVII" & pids+=($!)
+install_custom_app $work_dir "LTspice" $LTspice "$HOME/tools/LTspiceXVII" >> ./logs/LTspice.txt & pids+=($!)
 #DSView
-install_custom_app $work_dir "dsview" $DSView "$HOME/tools/dsview" & pids+=($!)
+install_custom_app $work_dir "dsview" $DSView "$HOME/tools/dsview" >> ./logs/dsview.txt & pids+=($!)
 #Virtualbox also requires user interaction if secureboot is enabled
-install_custom_app $work_dir "virtualbox" $VBOX "$HOME/tools/vbox" & pids+=($!)
+install_custom_app $work_dir "virtualbox" $VBOX "$HOME/tools/vbox" >> ./logs/virtualbox.txt & pids+=($!)
 #VScode
-install_custom_app  $work_dir "code" $CODE "$custom_install_dir/code" & pids+=($!)
+install_custom_app  $work_dir "code" $CODE "$custom_install_dir/code" >> ./logs/code.txt & pids+=($!)
 #miniconda
-install_custom_app  $work_dir "miniconda" $MINICONDA "$HOME/tools/miniconda3" & pids+=($!)
+install_custom_app  $work_dir "miniconda" $MINICONDA "$HOME/tools/miniconda3" >> ./logs/miniconda.txt & pids+=($!)
 #Docker
-install_custom_app  $work_dir "docker" $DOCKER "$HOME/tools/docker" & pids+=($!)
+install_custom_app  $work_dir "docker" $DOCKER "$HOME/tools/docker" >> ./logs/docker.txt & pids+=($!)
 #Vivado
-install_custom_app  $work_dir "vivado" $VIVADO "$HOME/tools/xilinx" & pids+=($!)
+install_custom_app  $work_dir "vivado" $VIVADO "$HOME/tools/xilinx" >> ./logs/vivado.txt & pids+=($!)
 #Prusa Slic3r
-install_custom_app  $work_dir "prusasclic3r" $PrusaSlicer "$HOME/tools/prusa" & pids+=($!)
+install_custom_app  $work_dir "prusasclic3r" $PrusaSlicer "$HOME/tools/prusa" >> ./logs/prusasclic3r.txt & pids+=($!)
 #Arduino
-install_custom_app  $work_dir "arduino" $ARDUINO "$HOME/tools/arduino" & pids+=($!)
+install_custom_app  $work_dir "arduino" $ARDUINO "$HOME/tools/arduino" >> ./logs/arduino.txt & pids+=($!)
 
 
 ##########################################
