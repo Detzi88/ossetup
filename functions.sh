@@ -104,7 +104,7 @@ set_custom_keybinding() {
 }
 
 install_custom_app() {
-	if [ "$#" -ne 3 || "$#" -gt 3 ]; then
+	if [ "$#" -lt 3 ]; then
         	echo "Usage: install_custom_app <work_dir 'Path'> <name 'string'> <install '0/1'> optional: <target 'Path'>"
         	echo "Example: install_custom_app \$workdir virtualbox 1 /home/me/tools"
         	return 1
@@ -147,7 +147,7 @@ wait_for_apt_lock() {
         
         # If lock files were found, sleep and check again
         if [ "$lock_found" -eq 1 ]; then
-            sleep 1
+            sleep 5
         else
             echo "No lock file found. Proceeding."
             break

@@ -165,8 +165,8 @@ echo "export LM_LICENSE_FILE=\"$custom_install_dir/lscc/diamond/3.13/license:\$L
 echo "export PATH=\"$custom_install_dir/intel/questa_fse/linux_x86_64:\$PATH\"" | tee -a ~/.bashrc
 echo "export LM_LICENSE_FILE=\"$custom_install_dir/intel/licenses/LR-182130_License.dat:\$LM_LICENSE_FILE\"" | tee -a ~/.bashrc
 #for serial port access
-usermod -a -G dialout $USER
-usermod -a -G plugdev $USER
+sudo usermod -a -G dialout $USER
+sudo usermod -a -G plugdev $USER
 
 
 ### Install my Applications
