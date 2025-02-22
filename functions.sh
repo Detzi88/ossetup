@@ -127,10 +127,10 @@ install_custom_app() {
 	fi
 
 	if [[ "$INSTALL" == "1" && -f ./apps/$NAME.sh ]]; then
-	    echo "Installing $NAME."
-	    ./apps/$NAME.sh $work_dir $target_path\e[33mT
+	    ./apps/$NAME.sh $work_dir $target_path
+	    echo "Installing ${CYAN}$NAME${RESETCOLOR} ${GREEN}done${RESETCOLOR}."
 	else
-	    echo "$NAME is not selected, or ./apps/$NAME.sh does not exist -$YELLOW skipping$RESETCOLOR."
+	    echo -e "${YELLOW}Skipping${RESETCOLOR} ${CYAN}${NAME}${RESETCOLOR}.It is either not selected, or ./apps/$NAME.sh does not exist ."
 	fi
 }
 
@@ -148,7 +148,7 @@ wait_for_apt_lock() {
         for lock_file in "${LOCK_FILES[@]}"; do
             if [ -e "$lock_file" ]; then
                 lock_found=1
-                echo "Lock file $lock_file found. ${YELLOW}waiting${RESETCOLOR}..."
+                echo -e "Lock file $lock_file found. ${YELLOW}waiting${RESETCOLOR}..."
                 break
             fi
         done
