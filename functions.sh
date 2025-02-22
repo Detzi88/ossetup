@@ -136,18 +136,17 @@ install_custom_app() {
 
 # Define the lock files
 LOCK_FILES=(
-    "/var/lib/dpkg/lock"
-    "/var/cache/apt/archives/lock"
-    "/var/lib/apt/lists/lock"
+    "/var/lib/dpkg/lock-frontend"
 )
 
 # Function to check if any apt lock file exists
 wait_for_apt_lock() {
+    break
     while true; do
         lock_found=0
         for lock_file in "${LOCK_FILES[@]}"; do
             if [ -e "$lock_file" ]; then
-                lock_found=1
+                #lock_found=1
                 echo -e "Lock file $lock_file found. ${YELLOW}waiting${RESETCOLOR}..."
                 break
             fi
