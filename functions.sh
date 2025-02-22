@@ -125,3 +125,21 @@ set_custom_keybinding() {
         fi
     fi
 }
+
+install_custom_app() {
+	if [ "$#" -ne 3 ]; then
+        	echo "Usage: install_custom_app <name 'string'> <install '0/1'> <work_dir 'Path'>"
+        	echo "Example: my_function virtualbox 1 \$workdir"
+        	return 1
+   	fi
+	local NAME="$1"
+	local INSTALL="$2"
+    	local work_dir="$3"
+    	
+	if [[ "$INSTALL" == "1" && -f ./apps/$NAME.sh ]]; then
+	    echo "Installing $NAME."
+	    ./apps/$NAME.sh $work_dir
+	else
+	    echo "$NAME is not selected, or ./apps/$NAME.sh does not exist - skipping."
+	fi
+}
