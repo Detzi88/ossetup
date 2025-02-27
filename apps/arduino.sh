@@ -2,6 +2,9 @@
 work_dir="$1"
 custom_install_dir="$2"
 arduino_installer="https://downloads.arduino.cc/arduino-ide/arduino-ide_2.3.4_Linux_64bit.zip"
+if [ -z "$work_dir" ]; then
+    work_dir="./work"
+fi
 curl -o "$work_dir/arduino.zip" -L  $arduino_installer
 mkdir $custom_install_dir
 unzip "$work_dir/arduino.zip" -d $custom_install_dir

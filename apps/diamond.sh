@@ -4,8 +4,11 @@ workdir="$1"
 install_dir="$2"
 #Aarch64 is not supported
 if [ "$(uname -m)" = "aarch64" ]; then
-    echo "No installation candidatest for aarch64"
+    echo "No installation candidates for aarch64"
     exit 1
+fi
+if [ -z "$workdir" ]; then
+    workdir="./work"
 fi
 #Put this into the same path as the downloaded .rpm file.
 #adjust the two following parameters as needed:
@@ -25,8 +28,7 @@ curl_header="User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/5
 current_dir=$PWD
 mkdir -p $workdir
 cd $workdir
-$SUDO apt update
-$SUDO apt install curl -y
+log_and_install curl
 curl -o diamond_base.rpm -L $lattice_file_link > /dev/null 2>&1 &
 DMD_CURL_PID=$!
 
@@ -39,29 +41,28 @@ LMS_CURL_PID=$!
 # If downloading does not work, copy stuff. This requires the needed binarys in a "binarys" folder next to this script
 #cp  ./binarys/diamond_3_13-base-56-2-x86_64-linux.rpm diamond_base.rpm
 #cp  ./binarys/diamond_3_13-encryption_security-56-2-x86_64-linux.rpm encryption_pack.rpm
-wait_for_apt_lock
 $SUDO dpkg --add-architecture i386
 #nedded for installing
-$SUDO apt install rpm2cpio rpm2cpio -y
-$SUDO apt install cpio cpio -y
-$SUDO apt install libusb-0.1-4 -y
-$SUDO apt install rpm -y
-$SUDO apt install sed -y
+log_and_install rpm2cpio --noupdate
+log_and_install cpio --noupdate
+log_and_install libusb-0.1-4 --noupdate
+log_and_install rpm --noupdate
+log_and_install sed --noupdate
 #modelsim deps
-$SUDO apt install libxft2:i386 -y
+log_and_install libxft2:i386 --noupdate
 #diamond deps
-$SUDO apt install libxtst6 -y
-$SUDO apt install libsm6 -y
-$SUDO apt install libxrender1 -y
-$SUDO apt install libxext6 -y
+log_and_install libxtst6 --noupdate
+log_and_install libsm6 --noupdate
+log_and_install libxrender1 --noupdate
+log_and_install libxext6 --noupdate
 #the bundled libstdc++6 is broken i need to fix that
-$SUDO apt install libstdc++6 -y
+log_and_install libstdc++6 --noupdate
 #LMS Stuff
-$SUDO apt install libglib2.0-0:i386 -y
-$SUDO apt install libgdk-pixbuf2.0-0:i386 -y
-$SUDO apt install libgtk2.0-0:i386 -y
-$SUDO apt install libcanberra-gtk-module:i386 -y
-$SUDO apt install libcanberra-gtk3-module:i386 -y
+log_and_install libglib2.0-0:i386 --noupdate
+log_and_install libgdk-pixbuf2.0-0:i386 --noupdate
+log_and_install libgtk2.0-0:i386 --noupdate
+log_and_install libcanberra-gtk-module:i386 --noupdate
+log_and_install libcanberra-gtk3-module:i386 --noupdate
 
  	 
 # Define the directory and filename for the .desktop file

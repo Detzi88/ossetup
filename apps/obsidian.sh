@@ -2,6 +2,12 @@
 . ../functions.sh
 work_dir="$1"
 custom_install_dir="$2"
+if [ -z "$work_dir" ]; then
+    work_dir="./work"
+fi
+if [ -z "$custom_install_dir" ]; then
+    custom_install_dir="$HOME/tools/obsidian"
+fi
 desktop_file="$HOME/.local/share/applications/obsidian.desktop"
 appImage="https://github.com/obsidianmd/obsidian-releases/releases/download/v1.8.7/Obsidian-1.8.7-arm64.AppImage"
 

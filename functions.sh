@@ -134,37 +134,24 @@ install_custom_app() {
 	fi
 }
 
-# Define the lock files
-LOCK_FILES=(
-    "/var/lib/apt/lists/lock"
-)
-
-# Function to check if any apt lock file exists
-wait_for_apt_lock() {
-    while true; do
-        lock_found=0
-        for lock_file in "${LOCK_FILES[@]}"; do
-            if [ -e "$lock_file" ]; then
-                lock_found=1
-                echo -e "Lock file $lock_file found. ${YELLOW}waiting${RESETCOLOR}..."
-                break
-            fi
-        done
-        
-        # If lock files were found, sleep and check again
-        if [ "$lock_found" -eq 1 ]; then
-            sleep 5
-        else
-            echo "No lock file found. Proceeding."
-            break
-        fi
-    done
-}
 
 log_and_install() {
    # wait_for_apt_lock
+    UPDATE=1
     mkdir -p ./logs
-    echo "installing $1" >>log.txt && sudo apt-get install "$1" -y >>./logs/$1.txt
+
+    for arg in "$@"; do
+        if [ "$arg" = "--noupdate" ]; then
+            UPDATE=0
+            break  # Stop checking once found
+        fi
+    done
+
+    if [ "$UPDATE" = "1" ]; then
+        sudo apt-get -o DPkg::Lock::Timeout=3600 update
+    fi
+        
+    echo "installing $1" >>log.txt && sudo apt-get -o DPkg::Lock::Timeout=3600 install "$1" -y >>./logs/$1.txt
 }
 
 install_deb_package() {
@@ -181,7 +168,7 @@ install_deb_package() {
     curl -o "$file_name" -L "$download_link"
     # Install the downloaded package
     #wait_for_apt_lock
-    sudo apt-get install -y ./"$file_name"
+    sudo apt-get -o DPkg::Lock::Timeout=3600 install -y ./"$file_name"
     # Remove the downloaded .deb file
     rm "$file_name"
     echo "Installation completed and $file_name file removed."

@@ -34,7 +34,7 @@ mkdir -p "$HOME/svn"
 mkdir -p ./logs
 
 # I need curl for all the background downloads to work so install it first:
-sudo apt install curl -y
+log_and_install curl 
 
 applications=(  "build-essential" 
                 "net-tools" 
@@ -104,34 +104,33 @@ applications=(  "build-essential"
 
 
 #Quartus
-install_custom_app  $work_dir "quartus" "$QUARTUS $custom_install_dir/intel" >> ./logs/quartus.txt 
-#& pids+=($!)
+install_custom_app  $work_dir "quartus" "$QUARTUS $custom_install_dir/intel" >> ./logs/quartus.txt & pids+=($!)
 #Wine
-install_custom_app "$work_dir" "wine" $WINE "$custom_install_dir/wine" >> ./logs/wine.txt
+install_custom_app "$work_dir" "wine" $WINE "$custom_install_dir/wine" >> ./logs/wine.txt & pids+=($!)
 #steam 
-install_custom_app $work_dir "steam" $STEAM "$custom_install_dir/steam" >> ./logs/steam.txt
+install_custom_app $work_dir "steam" $STEAM "$custom_install_dir/steam" >> ./logs/steam.txt & pids+=($!)
 #Lattice diamond
-install_custom_app $work_dir "diamond" $DIAMOND "$HOME/tools/lscc" >> ./logs/diamond.txt
+install_custom_app $work_dir "diamond" $DIAMOND "$HOME/tools/lscc" >> ./logs/diamond.txt & pids+=($!)
 #LTspiceXVII
-install_custom_app $work_dir "LTspice" $LTspice "$HOME/tools/LTspiceXVII" >> ./logs/LTspice.txt
+install_custom_app $work_dir "LTspice" $LTspice "$HOME/tools/LTspiceXVII" >> ./logs/LTspice.txt & pids+=($!)
 #DSView
-install_custom_app $work_dir "dsview" $DSView "$HOME/tools/dsview" >> ./logs/dsview.txt 
+install_custom_app $work_dir "dsview" $DSView "$HOME/tools/dsview" >> ./logs/dsview.txt & pids+=($!)
 #Virtualbox also requires user interaction if secureboot is enabled
-install_custom_app $work_dir "virtualbox" $VBOX "$HOME/tools/vbox" >> ./logs/virtualbox.txt
+install_custom_app $work_dir "virtualbox" $VBOX "$HOME/tools/vbox" >> ./logs/virtualbox.txt & pids+=($!)
 #VScode
-install_custom_app  $work_dir "code" $CODE "$custom_install_dir/code" >> ./logs/code.txt
+install_custom_app  $work_dir "code" $CODE "$custom_install_dir/code" >> ./logs/code.txt & pids+=($!)
 #miniconda
-install_custom_app  $work_dir "miniconda" $MINICONDA "$HOME/tools/miniconda3" >> ./logs/miniconda.txt 
+install_custom_app  $work_dir "miniconda" $MINICONDA "$HOME/tools/miniconda3" >> ./logs/miniconda.txt & pids+=($!)
 #Docker
-install_custom_app  $work_dir "docker" $DOCKER "$HOME/tools/docker" >> ./logs/docker.txt 
+install_custom_app  $work_dir "docker" $DOCKER "$HOME/tools/docker" >> ./logs/docker.txt & pids+=($!)
 #Vivado
-install_custom_app  $work_dir "vivado" $VIVADO "$HOME/tools/xilinx" >> ./logs/vivado.txt 
+install_custom_app  $work_dir "vivado" $VIVADO "$HOME/tools/xilinx" >> ./logs/vivado.txt & pids+=($!)
 #Prusa Slic3r
-install_custom_app  $work_dir "prusasclic3r" $PrusaSlicer "$HOME/tools/prusa" >> ./logs/prusasclic3r.txt 
+install_custom_app  $work_dir "prusasclic3r" $PrusaSlicer "$HOME/tools/prusa" >> ./logs/prusasclic3r.txt & pids+=($!)
 #Arduino
-install_custom_app  $work_dir "arduino" $ARDUINO "$HOME/tools/arduino" >> ./logs/arduino.txt 
+install_custom_app  $work_dir "arduino" $ARDUINO "$HOME/tools/arduino" >> ./logs/arduino.txt & pids+=($!)
 #obsidian
-install_custom_app  $work_dir "obsidian" $OBSIDIAN "$HOME/tools/obsidian" >> ./logs/obsidian.txt
+install_custom_app  $work_dir "obsidian" $OBSIDIAN "$HOME/tools/obsidian" >> ./logs/obsidian.txt & pids+=($!)
 
 ##########################################
 ###CUSTOMIZE THE OS
@@ -185,20 +184,19 @@ sudo usermod -a -G plugdev $USER
 
 
 ### Install my Applications
-#wait_for_apt_lock
-sudo apt update #update the package lists
-sudo apt upgrade -y #install updates
-sudo apt remove nvidia* -y
-sudo apt autoremove -y
-echo "Installing missing drivers:"
-sudo ubuntu-drivers autoinstall #install missing drivers
+sudo apt-get -o DPkg::Lock::Timeout=3600 update #update the package lists
+sudo apt-get -o DPkg::Lock::Timeout=3600 upgrade -y #install updates
+sudo apt-get -o DPkg::Lock::Timeout=3600 remove nvidia* -y
+sudo apt-get -o DPkg::Lock::Timeout=3600 autoremove -y
+#echo "Installing missing drivers:"
+#sudo ubuntu-drivers autoinstall #install missing drivers
 for app in "${applications[@]}"; do
-    log_and_install "$app"
+    log_and_install "$app" --noupdate
 done
 
 
 #remove the speech dispatcher (audio crackling issue)
-sudo apt remove speech-dispatcher -y
+sudo apt-get remove speech-dispatcher -y
 sudo systemctl disable speech-dispatcherd
 sudo systemctl disable speech-dispatcher
 sudo systemctl stop speech-dispatcherd
@@ -213,8 +211,8 @@ done
 chmod +x $HOME/Desktop/*.desktop
 mv $HOME/Desktop/*.desktop $desktop_file_dir/
 rm $HOME/Desktop/*
-sudo apt autoremove -y
+sudo apt-get autoremove -y
 rm -r "$work_dir"
 if [ "$reboot_required" = true ]; then
-    reboot
+    sudo shutdown -r now
 fi
