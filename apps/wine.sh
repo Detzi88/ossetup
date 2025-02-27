@@ -1,5 +1,6 @@
 #!/bin/bash
-. ../functions.sh
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+. ${SCRIPT_DIR}/../functions.sh
 work_dir="$1"
 custom_install_dir="$2"
 WINE_URL="https://dl.winehq.org/wine-builds/debian/dists/bookworm/winehq-bookworm.sources"

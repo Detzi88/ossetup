@@ -104,6 +104,7 @@ applications=(  "build-essential"
 
 
 #Quartus
+
 install_custom_app  $work_dir "quartus" "$QUARTUS $custom_install_dir/intel" >> ./logs/quartus.txt & pids+=($!)
 #Wine
 install_custom_app "$work_dir" "wine" $WINE "$custom_install_dir/wine" >> ./logs/wine.txt & pids+=($!)
