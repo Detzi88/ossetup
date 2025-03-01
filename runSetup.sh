@@ -2,11 +2,8 @@
 ####use this command to run the script:
 #./setupUbuntu.sh
 ######################################
-BASH_BG_COLOR="#300A24"
-BASH_TEXT_COLOR='rgb(211,215,207)'
-THEME_LINK="https://drive.google.com/drive/folders/1RVy9FwWzhTMdpvV9njsN1e-98F0PVQgB?usp=sharing"
 . ./functions.sh
-reboot_required=false  # or false, depending on your condition
+reboot_required=false  #depending on your condition
 QUARTUS=0
 WINE=1
 STEAM=1
@@ -21,6 +18,7 @@ VIVADO=0
 PrusaSlicer=1
 ARDUINO=1
 OBSIDIAN=1
+THEMES=1
 
 work_dir="$HOME/Downloads/setupWork"
 custom_install_dir="/home/$USER/tools"
@@ -134,6 +132,7 @@ install_custom_app  $work_dir "arduino" $ARDUINO "$HOME/tools/arduino" & pids+=(
 #obsidian
 install_custom_app  $work_dir "obsidian" $OBSIDIAN "$HOME/tools/obsidian" & pids+=($!)
 
+
 ##########################################
 ###CUSTOMIZE THE OS
 ##########################################
@@ -148,35 +147,22 @@ touch /home/$USER/Templates/verilog.v
 touch /home/$USER/Templates/text.txt
 touch /home/$USER/Templates/Readme.md
 touch /home/$USER/Templates/Makefile
-#Disable the show-apps Button and do other customisations
-gsettings set org.gnome.shell.extensions.dash-to-dock show-show-apps-button false
-gsettings set org.gnome.SessionManager logout-prompt false
-gsettings set org.gnome.shell.extensions.ding show-home false
-gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'BOTTOM'
-gsettings set org.gnome.shell.extensions.dash-to-dock extend-height false
-gsettings set org.gnome.desktop.notifications show-banners false
-#gsettings list-keys org.gnome.Terminal.Legacy.Profile
-THEMEID=$(gsettings get org.gnome.Terminal.ProfilesList list)
-THEMEID=$( echo ${THEMEID}|tr -d "[]'")
-gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:${THEMEID}/ use-theme-colors false
-gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:${THEMEID}/ foreground-color ${BASH_TEXT_COLOR}
-gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:${THEMEID}/ background-color ${BASH_BG_COLOR}
-if [ "$(DISTRO_ID)" = "Ubuntu" ]; then
-  #dock auto hide , hiding volumes devices and trash
-  gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false 
-  gsettings set org.gnome.desktop.interface.gtk-theme 'Yaru-purple-dark'
-  gsettings set org.gnome.shell.extensions.dash-to-dock show-mounts false
-  gsettings set org.gnome.shell.extensions.dash-to-dock show-trash false
-else
-  gsettings set org.gnome.desktop.interface gtk-theme "Adwaita-dark"
-fi
- 
 #Set my shortcuts
 set_custom_keybinding "custom0" "Terminal" "gnome-terminal" "<Super>t"
 set_custom_keybinding "custom1" "Task Manager" "gnome-system-monitor" "<Primary><Shift>Escape"
 set_custom_keybinding "custom2" "Firefox" "firefox" "<Super>f"
 set_custom_keybinding "custom3" "Nautilus" "nautilus" "<Super>x"
 set_custom_keybinding "custom4" "Set Monitors" "/home/$USER/Nextcloud/Documents/Projekte/LinuxSetup/Setup/monitors/hdmi-mirror.sh" "<Super>d"
+#Disable the show-apps Button and do other customisations
+gsettings set org.gnome.SessionManager logout-prompt false
+gsettings set org.gnome.shell.extensions.ding show-home false
+if [ "$(DISTRO_ID)" = "Ubuntu" ]; then
+  gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'BOTTOM'
+  gsettings set org.gnome.shell.extensions.dash-to-dock extend-height false
+fi
+gsettings set org.gnome.desktop.notifications show-banners false
+gsettings set org.gnome.shell favorite-apps "['firefox-esr.desktop', 'org.gnome.Nautilus.desktop']"
+ 
 #set the grub default timeout to something reasonable and hide it:
 sudo sed -i -e 's/GaarRUB_TIMEOUT=10/GRUB_TIMEOUT=1\n#/g' /etc/default/grub
 #If on the arm add the cutmem. But this should already be done whilst in the live session.
@@ -194,7 +180,6 @@ echo "export LM_LICENSE_FILE=\"$custom_install_dir/intel/licenses/LR-182130_Lice
 #for serial port access
 sudo usermod -a -G dialout $USER
 sudo usermod -a -G plugdev $USER
-
 
 ### Install my Applications
 sudo apt-get -o DPkg::Lock::Timeout=3600 update > /dev/null #update the package lists

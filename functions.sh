@@ -138,6 +138,7 @@ install_custom_app() {
 log_and_install() {
    # wait_for_apt_lock
     UPDATE=1
+    RETRY_TIMEOUT=5
     mkdir -p ./logs
 
     for arg in "$@"; do
@@ -148,14 +149,20 @@ log_and_install() {
     done
 
     if [ "$UPDATE" = "1" ]; then
-        sudo apt-get -o DPkg::Lock::Timeout=3600 update
+        while ! sudo apt-get -o DPkg::Lock::Timeout=3600 update; do
+        sleep $RETRY_TIMEOUT
+        done
     fi
         
-    echo "installing $1" >> deblog.log && sudo apt-get -o DPkg::Lock::Timeout=3600 install "$1" -y >>./logs/$1.log
+    echo "installing $1" >> deblog.log
+    while ! sudo apt-get -o DPkg::Lock::Timeout=3600 install "$1" -y >>./logs/$1.log ; do 
+        sleep $RETRY_TIMEOUT 
+    done 
 }
 
 install_deb_package() {
     # Check if the URL is provided
+    RETRY_TIMEOUT=5
     if [ -z "$1" ]; then
         echo "Usage: install_deb_package <download_link>"
         return 1
@@ -169,8 +176,9 @@ install_deb_package() {
     curl -o "$file_name" -L "$download_link"
     # Install the downloaded package
     #wait_for_apt_lock
-    sudo apt-get -o DPkg::Lock::Timeout=3600 install -y ./"$file_name"
+    while ! sudo apt-get -o DPkg::Lock::Timeout=3600 install -y ./"$file_name" ; do 
+        sleep $RETRY_TIMEOUT 
+    done
     # Remove the downloaded .deb file
     rm "$file_name"
-    echo "Installation completed and $file_name file removed."
 }
