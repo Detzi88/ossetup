@@ -21,5 +21,5 @@ Categories=Electronics;
 desktop_file_dir="$HOME/.local/share/applications"
 desktop_file="$desktop_file_dir/arduino.desktop"
 echo "$desktop_file_content" > "$desktop_file"
-usermod -a -G dialout $USER
-usermod -a -G plugdev $USER
+sudo usermod -a -G dialout $USER
+sudo usermod -a -G plugdev $USER

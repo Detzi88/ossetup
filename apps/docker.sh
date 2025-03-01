@@ -6,8 +6,13 @@ custom_install_dir="$2"
 if [ -z "$work_dir" ]; then
     work_dir="./work"
 fi
+
+for pkg in docker.io docker-doc docker-compose podman-docker containerd runc; do 
+  sudo apt-get remove $pkg; 
+done
 # Add Docker's official GPG key:
-log_and_install ca-certificates 
+sudo apt-get -o DPkg::Lock::Timeout=3600 update
+log_and_install ca-certificates --noupdate
 log_and_install curl --noupdate
 sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
@@ -18,11 +23,12 @@ echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
   $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get -o DPkg::Lock::Timeout=3600 update
 
-log_and_install docker-ce 
-log_and_install docker-ce-cli 
-log_and_install containerd.io 
-log_and_install docker-buildx-plugin 
-log_and_install docker-compose-plugin
+log_and_install docker-ce --noupdate
+log_and_install docker-ce-cli --noupdate
+log_and_install containerd.io --noupdate
+log_and_install docker-buildx-plugin --noupdate
+log_and_install docker-compose-plugin --noupdate
 sudo groupadd docker
 sudo usermod -aG docker $USER

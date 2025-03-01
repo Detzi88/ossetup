@@ -10,4 +10,4 @@ fi
 echo "installing virtualbox" >>log.txt
 install_deb_package ${VBOX_URL}
 rm "$work_dir/vbox.deb"
-usermod -a -G vboxusers $USER
+sudo usermod -a -G vboxusers $USER

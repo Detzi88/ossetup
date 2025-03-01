@@ -127,7 +127,7 @@ install_custom_app() {
 	fi
 
 	if [[ "$INSTALL" == "1" && -f ./apps/$NAME.sh ]]; then
-	    ./apps/$NAME.sh $work_dir $target_path
+	    ./apps/${NAME}.sh $work_dir $target_path >> ./logs/${NAME}.log 2>&1
 	    echo -e "Installing ${CYAN}$NAME${RESETCOLOR} ${GREEN}done${RESETCOLOR}."
 	else
 	    echo -e "${YELLOW}Skipping${RESETCOLOR} ${CYAN}${NAME}${RESETCOLOR}.It is either not selected, or ./apps/$NAME.sh does not exist ."
@@ -151,7 +151,7 @@ log_and_install() {
         sudo apt-get -o DPkg::Lock::Timeout=3600 update
     fi
         
-    echo "installing $1" >>log.txt && sudo apt-get -o DPkg::Lock::Timeout=3600 install "$1" -y >>./logs/$1.txt
+    echo "installing $1" >> deblog.log && sudo apt-get -o DPkg::Lock::Timeout=3600 install "$1" -y >>./logs/$1.log
 }
 
 install_deb_package() {
@@ -161,9 +161,10 @@ install_deb_package() {
         return 1
     fi
     # Assign the first argument to a variable
-    local download_link=$1
+    local download_link=${1}
+    domain=$(echo ${download_link} | awk -F[/:] '{print $4}')
     # Define the file name for the downloaded package
-    local file_name="package.deb"
+    local file_name="${domain}.deb"
     # Download the file
     curl -o "$file_name" -L "$download_link"
     # Install the downloaded package

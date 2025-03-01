@@ -10,3 +10,4 @@ sudo dpkg --add-architecture i386
 sudo mkdir -pm 755 /etc/apt/keyrings
 sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
 log_and_install winehq-devel
+log_and_install winetricks

@@ -4,10 +4,11 @@
 ######################################
 BASH_BG_COLOR="#300A24"
 BASH_TEXT_COLOR='rgb(211,215,207)'
+THEME_LINK="https://drive.google.com/drive/folders/1RVy9FwWzhTMdpvV9njsN1e-98F0PVQgB?usp=sharing"
 . ./functions.sh
 reboot_required=false  # or false, depending on your condition
 QUARTUS=0
-WINE=0
+WINE=1
 STEAM=1
 DIAMOND=0
 LTspice=0
@@ -15,7 +16,7 @@ VBOX=0
 DSView=0
 CODE=1
 MINICONDA=1
-DOCKER=0
+DOCKER=1
 VIVADO=0
 PrusaSlicer=1
 ARDUINO=1
@@ -26,6 +27,7 @@ custom_install_dir="/home/$USER/tools"
 
 #store the pids of background tasks
 pids=()
+DISTRO_ID=$(lsb_release -si)
 #create the default folders so they belong to the user
 mkdir -p "$work_dir"
 mkdir -p "$custom_install_dir"
@@ -44,7 +46,6 @@ applications=(  "build-essential"
                 "network-manager-vpnc" 
                 "vpnc" 
                 "default-jre"
-                "winetricks"
                 "kicad"
                 "texlive"
                 "texstudio" 
@@ -105,33 +106,33 @@ applications=(  "build-essential"
 
 #Quartus
 
-install_custom_app  $work_dir "quartus" "$QUARTUS $custom_install_dir/intel" >> ./logs/quartus.txt & pids+=($!)
+install_custom_app  $work_dir "quartus" "$QUARTUS $custom_install_dir/intel" & pids+=($!)
 #Wine
-install_custom_app "$work_dir" "wine" $WINE "$custom_install_dir/wine" >> ./logs/wine.txt & pids+=($!)
+install_custom_app "$work_dir" "wine" $WINE "$custom_install_dir/wine" & pids+=($!)
 #steam 
-install_custom_app $work_dir "steam" $STEAM "$custom_install_dir/steam" >> ./logs/steam.txt & pids+=($!)
+install_custom_app $work_dir "steam" $STEAM "$custom_install_dir/steam" & pids+=($!)
 #Lattice diamond
-install_custom_app $work_dir "diamond" $DIAMOND "$HOME/tools/lscc" >> ./logs/diamond.txt & pids+=($!)
+install_custom_app $work_dir "diamond" $DIAMOND "$HOME/tools/lscc" & pids+=($!)
 #LTspiceXVII
-install_custom_app $work_dir "LTspice" $LTspice "$HOME/tools/LTspiceXVII" >> ./logs/LTspice.txt & pids+=($!)
+install_custom_app $work_dir "LTspice" $LTspice "$HOME/tools/LTspiceXVII" & pids+=($!)
 #DSView
-install_custom_app $work_dir "dsview" $DSView "$HOME/tools/dsview" >> ./logs/dsview.txt & pids+=($!)
+install_custom_app $work_dir "dsview" $DSView "$HOME/tools/dsview" & pids+=($!)
 #Virtualbox also requires user interaction if secureboot is enabled
-install_custom_app $work_dir "virtualbox" $VBOX "$HOME/tools/vbox" >> ./logs/virtualbox.txt & pids+=($!)
+install_custom_app $work_dir "virtualbox" $VBOX "$HOME/tools/vbox" & pids+=($!)
 #VScode
-install_custom_app  $work_dir "code" $CODE "$custom_install_dir/code" >> ./logs/code.txt & pids+=($!)
+install_custom_app  $work_dir "code" $CODE "$custom_install_dir/code" & pids+=($!)
 #miniconda
-install_custom_app  $work_dir "miniconda" $MINICONDA "$HOME/tools/miniconda3" >> ./logs/miniconda.txt & pids+=($!)
+install_custom_app  $work_dir "miniconda" $MINICONDA "$HOME/tools/miniconda3" & pids+=($!)
 #Docker
-install_custom_app  $work_dir "docker" $DOCKER "$HOME/tools/docker" >> ./logs/docker.txt & pids+=($!)
+install_custom_app  $work_dir "docker" $DOCKER "$HOME/tools/docker" & pids+=($!)
 #Vivado
-install_custom_app  $work_dir "vivado" $VIVADO "$HOME/tools/xilinx" >> ./logs/vivado.txt & pids+=($!)
+install_custom_app  $work_dir "vivado" $VIVADO "$HOME/tools/xilinx" & pids+=($!)
 #Prusa Slic3r
-install_custom_app  $work_dir "prusasclic3r" $PrusaSlicer "$HOME/tools/prusa" >> ./logs/prusasclic3r.txt & pids+=($!)
+install_custom_app  $work_dir "prusasclic3r" $PrusaSlicer "$HOME/tools/prusa" & pids+=($!)
 #Arduino
-install_custom_app  $work_dir "arduino" $ARDUINO "$HOME/tools/arduino" >> ./logs/arduino.txt & pids+=($!)
+install_custom_app  $work_dir "arduino" $ARDUINO "$HOME/tools/arduino" & pids+=($!)
 #obsidian
-install_custom_app  $work_dir "obsidian" $OBSIDIAN "$HOME/tools/obsidian" >> ./logs/obsidian.txt & pids+=($!)
+install_custom_app  $work_dir "obsidian" $OBSIDIAN "$HOME/tools/obsidian" & pids+=($!)
 
 ##########################################
 ###CUSTOMIZE THE OS
@@ -154,11 +155,22 @@ gsettings set org.gnome.shell.extensions.ding show-home false
 gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'BOTTOM'
 gsettings set org.gnome.shell.extensions.dash-to-dock extend-height false
 gsettings set org.gnome.desktop.notifications show-banners false
+#gsettings list-keys org.gnome.Terminal.Legacy.Profile
 THEMEID=$(gsettings get org.gnome.Terminal.ProfilesList list)
 THEMEID=$( echo ${THEMEID}|tr -d "[]'")
+gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:${THEMEID}/ use-theme-colors false
 gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:${THEMEID}/ foreground-color ${BASH_TEXT_COLOR}
 gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:${THEMEID}/ background-color ${BASH_BG_COLOR}
-#I still need to manually adjust the dock behaviour. Auto hide does not work, neither does hiding volumes devices and trash 
+if [ "$(DISTRO_ID)" = "Ubuntu" ]; then
+  #dock auto hide , hiding volumes devices and trash
+  gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false 
+  gsettings set org.gnome.desktop.interface.gtk-theme 'Yaru-purple-dark'
+  gsettings set org.gnome.shell.extensions.dash-to-dock show-mounts false
+  gsettings set org.gnome.shell.extensions.dash-to-dock show-trash false
+else
+  gsettings set org.gnome.desktop.interface gtk-theme "Adwaita-dark"
+fi
+ 
 #Set my shortcuts
 set_custom_keybinding "custom0" "Terminal" "gnome-terminal" "<Super>t"
 set_custom_keybinding "custom1" "Task Manager" "gnome-system-monitor" "<Primary><Shift>Escape"
@@ -166,7 +178,7 @@ set_custom_keybinding "custom2" "Firefox" "firefox" "<Super>f"
 set_custom_keybinding "custom3" "Nautilus" "nautilus" "<Super>x"
 set_custom_keybinding "custom4" "Set Monitors" "/home/$USER/Nextcloud/Documents/Projekte/LinuxSetup/Setup/monitors/hdmi-mirror.sh" "<Super>d"
 #set the grub default timeout to something reasonable and hide it:
-sudo sed -i -e 's/GRUB_TIMEOUT=10/GRUB_TIMEOUT=1\n#/g' /etc/default/grub
+sudo sed -i -e 's/GaarRUB_TIMEOUT=10/GRUB_TIMEOUT=1\n#/g' /etc/default/grub
 #If on the arm add the cutmem. But this should already be done whilst in the live session.
 if [ "$(uname -m)" = "aarch64" ]; then
     sudo sed -i -e 's/GRUB_CMDLINE_LINUX=""/GRUB_CMDLINE_LINUX="cutmem 0x8800000000 0x8fffffffff"#/g' /etc/default/grub
@@ -185,10 +197,10 @@ sudo usermod -a -G plugdev $USER
 
 
 ### Install my Applications
-sudo apt-get -o DPkg::Lock::Timeout=3600 update #update the package lists
-sudo apt-get -o DPkg::Lock::Timeout=3600 upgrade -y #install updates
-sudo apt-get -o DPkg::Lock::Timeout=3600 remove nvidia* -y
-sudo apt-get -o DPkg::Lock::Timeout=3600 autoremove -y
+sudo apt-get -o DPkg::Lock::Timeout=3600 update > /dev/null #update the package lists
+sudo apt-get -o DPkg::Lock::Timeout=3600 upgrade -y > /dev/null #install updates
+sudo apt-get -o DPkg::Lock::Timeout=3600 remove nvidia* -y > /dev/null
+sudo apt-get -o DPkg::Lock::Timeout=3600 autoremove -y > /dev/null
 #echo "Installing missing drivers:"
 #sudo ubuntu-drivers autoinstall #install missing drivers
 for app in "${applications[@]}"; do
@@ -197,7 +209,7 @@ done
 
 
 #remove the speech dispatcher (audio crackling issue)
-sudo apt-get remove speech-dispatcher -y
+sudo apt-get remove speech-dispatcher -y > /dev/null
 sudo systemctl disable speech-dispatcherd
 sudo systemctl disable speech-dispatcher
 sudo systemctl stop speech-dispatcherd
@@ -213,6 +225,7 @@ chmod +x $HOME/Desktop/*.desktop
 mv $HOME/Desktop/*.desktop $desktop_file_dir/
 rm $HOME/Desktop/*
 sudo apt-get autoremove -y
+sudo apt-get -o DPkg::Lock::Timeout=3600 update
 rm -r "$work_dir"
 if [ "$reboot_required" = true ]; then
     sudo shutdown -r now
