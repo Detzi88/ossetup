@@ -1,9 +1,11 @@
 ######################################
 ####use this command to run the script:
-#./setupUbuntu.sh
+#./runSetup.sh
 ######################################
-. ./functions.sh
-reboot_required=false  #depending on your condition
+#!/bin/bash
+######################################
+#CUSTOMIZE SPECIAL APPs
+######################################
 QUARTUS=0
 WINE=1
 STEAM=1
@@ -19,19 +21,40 @@ PrusaSlicer=1
 ARDUINO=1
 OBSIDIAN=1
 THEMES=1
+DASH2DOCK=1
+#######################################
+#######################################
+BASH_BG_COLOR="#3A0C2B"
+BASH_TEXT_COLOR='rgb(211,215,207)'
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+. ${SCRIPT_DIR}/functions.sh
+work_dir="$1"
+custom_install_dir="$2"
 
-work_dir="$HOME/Downloads/setupWork"
-custom_install_dir="/home/$USER/tools"
+if [ -z "${work_dir}" ]; then
+  work_dir="$HOME/Downloads/setupWork"
+fi
+
+if [ -z "$custom_install_dir" ]; then
+  custom_install_dir="/home/$USER/tools"
+fi
+
+#Dash 2 dock is currently the only package requirering a reboot
+if [ "$DASH2DOCK" = "1" ]; then
+  reboot_required=true
+else
+  reboot_required=false
+fi
 
 #store the pids of background tasks
 pids=()
 DISTRO_ID=$(lsb_release -si)
 #create the default folders so they belong to the user
-mkdir -p "$work_dir"
+mkdir -p "${work_dir}"
 mkdir -p "$custom_install_dir"
 mkdir -p "$HOME/git"
-mkdir -p "$HOME/svn"
-mkdir -p ./logs
+#mkdir -p "$HOME/svn"
+mkdir -p ${SCRIPT_DIR}/logs
 
 # I need curl for all the background downloads to work so install it first:
 log_and_install curl 
@@ -99,43 +122,45 @@ applications=(  "build-essential"
                 "xvfb" 
                 "tftpd" 
                 "tftp"
+                "firmware-linux"
 )
 
 
 #Quartus
-
-install_custom_app  $work_dir "quartus" "$QUARTUS $custom_install_dir/intel" & pids+=($!)
+install_custom_app ${work_dir} "quartus" "$QUARTUS $custom_install_dir/intel" & pids+=($!)
 #Wine
-install_custom_app "$work_dir" "wine" $WINE "$custom_install_dir/wine" & pids+=($!)
+install_custom_app ${work_dir} "wine" $WINE "$custom_install_dir/wine" & pids+=($!)
 #steam 
-install_custom_app $work_dir "steam" $STEAM "$custom_install_dir/steam" & pids+=($!)
+install_custom_app ${work_dir} "steam" $STEAM "$custom_install_dir/steam" & pids+=($!)
 #Lattice diamond
-install_custom_app $work_dir "diamond" $DIAMOND "$HOME/tools/lscc" & pids+=($!)
+install_custom_app ${work_dir} "diamond" $DIAMOND "$HOME/tools/lscc" & pids+=($!)
 #LTspiceXVII
-install_custom_app $work_dir "LTspice" $LTspice "$HOME/tools/LTspiceXVII" & pids+=($!)
+install_custom_app ${work_dir} "LTspice" $LTspice "$HOME/tools/LTspiceXVII" & pids+=($!)
 #DSView
-install_custom_app $work_dir "dsview" $DSView "$HOME/tools/dsview" & pids+=($!)
+install_custom_app ${work_dir} "dsview" $DSView "$HOME/tools/dsview" & pids+=($!)
 #Virtualbox also requires user interaction if secureboot is enabled
-install_custom_app $work_dir "virtualbox" $VBOX "$HOME/tools/vbox" & pids+=($!)
+install_custom_app ${work_dir} "virtualbox" $VBOX "$HOME/tools/vbox" & pids+=($!)
 #VScode
-install_custom_app  $work_dir "code" $CODE "$custom_install_dir/code" & pids+=($!)
+install_custom_app ${work_dir} "code" $CODE "$custom_install_dir/code" & pids+=($!)
 #miniconda
-install_custom_app  $work_dir "miniconda" $MINICONDA "$HOME/tools/miniconda3" & pids+=($!)
+install_custom_app ${work_dir} "miniconda" $MINICONDA "$HOME/tools/miniconda3" & pids+=($!)
 #Docker
-install_custom_app  $work_dir "docker" $DOCKER "$HOME/tools/docker" & pids+=($!)
+install_custom_app ${work_dir} "docker" $DOCKER "$HOME/tools/docker" & pids+=($!)
 #Vivado
-install_custom_app  $work_dir "vivado" $VIVADO "$HOME/tools/xilinx" & pids+=($!)
+install_custom_app ${work_dir} "vivado" $VIVADO "$HOME/tools/xilinx" & pids+=($!)
 #Prusa Slic3r
-install_custom_app  $work_dir "prusasclic3r" $PrusaSlicer "$HOME/tools/prusa" & pids+=($!)
+install_custom_app ${work_dir} "prusasclic3r" $PrusaSlicer "$HOME/tools/prusa" & pids+=($!)
 #Arduino
-install_custom_app  $work_dir "arduino" $ARDUINO "$HOME/tools/arduino" & pids+=($!)
+install_custom_app ${work_dir} "arduino" $ARDUINO "$HOME/tools/arduino" & pids+=($!)
 #obsidian
-install_custom_app  $work_dir "obsidian" $OBSIDIAN "$HOME/tools/obsidian" & pids+=($!)
-
+install_custom_app ${work_dir} "obsidian" $OBSIDIAN "$HOME/tools/obsidian" & pids+=($!)
+#obsidian
+install_custom_app ${work_dir} "dash2dock" $DASH2DOCK "$HOME/tools/dash2dock" & pids+=($!)
 
 ##########################################
 ###CUSTOMIZE THE OS
 ##########################################
+
 #Add File templates to your templates folder
 mkdir /home/$USER/Templates/
 touch /home/$USER/Templates/python3.py
@@ -147,13 +172,15 @@ touch /home/$USER/Templates/verilog.v
 touch /home/$USER/Templates/text.txt
 touch /home/$USER/Templates/Readme.md
 touch /home/$USER/Templates/Makefile
+
 #Set my shortcuts
 set_custom_keybinding "custom0" "Terminal" "gnome-terminal" "<Super>t"
 set_custom_keybinding "custom1" "Task Manager" "gnome-system-monitor" "<Primary><Shift>Escape"
 set_custom_keybinding "custom2" "Firefox" "firefox" "<Super>f"
 set_custom_keybinding "custom3" "Nautilus" "nautilus" "<Super>x"
-set_custom_keybinding "custom4" "Set Monitors" "/home/$USER/Nextcloud/Documents/Projekte/LinuxSetup/Setup/monitors/hdmi-mirror.sh" "<Super>d"
-#Disable the show-apps Button and do other customisations
+set_custom_keybinding "custom4" "Set Monitors" "$HOME/Nextcloud/Documents/Projekte/LinuxSetup/Setup/monitors/hdmi-mirror.sh" "<Super>d"
+
+#Customize Gnome
 gsettings set org.gnome.SessionManager logout-prompt false
 gsettings set org.gnome.shell.extensions.ding show-home false
 if [ "$(DISTRO_ID)" = "Ubuntu" ]; then
@@ -172,6 +199,7 @@ fi
 echo "GRUB_HIDDEN_TIMEOUT_QUIET=1" | sudo tee -a /etc/default/grub
 echo "GRUB_HIDDEN_TIMEOUT_QUIET=true" | sudo tee -a /etc/default/grub
 sudo update-grub
+
 #add aliases and Paths to the bashrc
 echo "alias gg='git gui'" | tee -a ~/.bashrc
 echo "export LM_LICENSE_FILE=\"$custom_install_dir/lscc/diamond/3.13/license:\$LM_LICENSE_FILE\"" | tee -a ~/.bashrc
@@ -186,12 +214,15 @@ sudo apt-get -o DPkg::Lock::Timeout=3600 update > /dev/null #update the package 
 sudo apt-get -o DPkg::Lock::Timeout=3600 upgrade -y > /dev/null #install updates
 sudo apt-get -o DPkg::Lock::Timeout=3600 remove nvidia* -y > /dev/null
 sudo apt-get -o DPkg::Lock::Timeout=3600 autoremove -y > /dev/null
+
 #echo "Installing missing drivers:"
-#sudo ubuntu-drivers autoinstall #install missing drivers
+if [ "$(DISTRO_ID)" = "Ubuntu" ]; then
+  sudo ubuntu-drivers autoinstall
+fi
+
 for app in "${applications[@]}"; do
     log_and_install "$app" --noupdate
 done
-
 
 #remove the speech dispatcher (audio crackling issue)
 sudo apt-get remove speech-dispatcher -y > /dev/null
@@ -200,7 +231,10 @@ sudo systemctl disable speech-dispatcher
 sudo systemctl stop speech-dispatcherd
 sudo systemctl stop speech-dispatcher
 
+##########################################
 ### CLEANUP
+##########################################
+
 #wait for the spawned tasks to finish:
 for pid in "${pids[@]}"; do
     wait "$pid"
@@ -211,7 +245,7 @@ mv $HOME/Desktop/*.desktop $desktop_file_dir/
 rm $HOME/Desktop/*
 sudo apt-get autoremove -y
 sudo apt-get -o DPkg::Lock::Timeout=3600 update
-rm -r "$work_dir"
+rm -r "${work_dir}"
 if [ "$reboot_required" = true ]; then
     sudo shutdown -r now
 fi

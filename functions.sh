@@ -155,7 +155,7 @@ log_and_install() {
     fi
         
     echo "installing $1" >> deblog.log
-    while ! sudo apt-get -o DPkg::Lock::Timeout=3600 install "$1" -y >>./logs/$1.log ; do 
+    while ! sudo apt-get -o DPkg::Lock::Timeout=3600 install "$1" -y >>./logs/$1.log 2>&1 ; do 
         sleep $RETRY_TIMEOUT 
     done 
 }

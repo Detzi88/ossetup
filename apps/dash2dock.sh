@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e  # Exit on error
 BASH_BG_COLOR="#3A0C2B"
 BASH_TEXT_COLOR='rgb(211,215,207)'
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
@@ -8,7 +7,7 @@ work_dir="$1"
 custom_install_dir="$2"
 
 if [ -z "$work_dir" ]; then
-  work_dir="./d2dwdir"
+  work_dir="$SCRIPT_DIR/d2dwdir"
 fi
 
 if [ -z "$custom_install_dir" ]; then
@@ -27,23 +26,40 @@ log_and_install wget --noupdate
 log_and_install unzip --noupdate
 log_and_install curl --noupdate
 
-# Get user extensions directory
-EXT_DIR="$HOME/.local/share/gnome-shell"
-mkdir -p "$EXT_DIR/tmp"
-
 EXT_INFO=$(curl -s "https://extensions.gnome.org/extension-info/?pk=$EXTENSION_ID&shell_version=$GNOME_VERSION")
 EXT_DL_URL=$(echo "$EXT_INFO" | jq -r '.download_url')
 
 # Download and install the extension
 echo "Downloading Dash to Dock..."
-wget -q -O $work_dir/dash-to-dock.zip "https://extensions.gnome.org$EXT_DL_URL"
-unzip -qo $work_dir/dash-to-dock.zip -d $work_dir
-EXT_UUID=$(cat $EXT_DIR/metadata.json | grep uuid | cut -d \" -f4)
-sudo gnome-extensions install $work_dir/dash-to-dock.zip
-gnome-extensions enable $EXT_UUID
+wget -q -O ./dash-to-dock.zip "https://extensions.gnome.org$EXT_DL_URL"
+unzip -qo dash-to-dock.zip
+EXT_UUID=$(cat $work_dir/metadata.json | grep uuid | cut -d \" -f4)
+gnome-extensions install $work_dir/dash-to-dock.zip
+
 rm -r $work_dir
-if [[ "$XDG_SESSION_TYPE" == "wayland" ]]; then
-    gnome-session-quit --logout --no-prompt
+enabled_extensions=$(gsettings get org.gnome.shell enabled-extensions)
+disabled_extensions=$(gsettings get org.gnome.shell disabled-extensions)
+if [ "$enabled_extensions" = "@as []" ]; then
+    enabled_extensions="['${EXT_UUID}']"
 else
-    killall -3 gnome-shell
+    enabled_extensions= $(echo $enabled_extensions |sed "s/]$/, '$EXT_UUID']/")
 fi
+
+if [ "$disabled_extensions" = "@as []" ]; then
+    disabled_extensions="[]"
+else
+    #First Middle/Last Only
+    enabled_extensions= $(echo $disabled_extensions |sed "s/,$EXT_UUID$//")
+    enabled_extensions= $(echo $disabled_extensions |sed "s/$EXT_UUID,$//")
+    enabled_extensions= $(echo $disabled_extensions |sed "s/$EXT_UUID$//")
+fi
+
+gsettings set org.gnome.shell disabled-extensions "$disabled_extensions"
+gsettings set org.gnome.shell enabled-extensions "$enabled_extensions"
+D2D_SCHEMADIR="$HOME/.local/share/gnome-shell/extensions/dash-to-dock@micxgx.gmail.com/schemas/"
+#gsettings --schemadir $D2D_SCHEMADIR list-recursively org.gnome.shell.extensions.dash-to-dock
+gsettings --schemadir $D2D_SCHEMADIR set org.gnome.shell.extensions.dash-to-dock show-mounts false
+gsettings --schemadir $D2D_SCHEMADIR set org.gnome.shell.extensions.dash-to-dock show-trash false
+gsettings --schemadir $D2D_SCHEMADIR set org.gnome.shell.extensions.dash-to-dock show-show-apps-button false
+gsettings --schemadir $D2D_SCHEMADIR set org.gnome.shell.extensions.dash-to-dock disable-overview-on-startup true
+gsettings --schemadir $D2D_SCHEMADIR set org.gnome.shell.extensions.dash-to-dock apply-custom-theme true
