@@ -6,7 +6,7 @@
 ######################################
 #CUSTOMIZE SPECIAL APPs
 ######################################
-QUARTUS=1
+QUARTUS=0
 WINE=1
 STEAM=1
 DIAMOND=1
@@ -30,7 +30,7 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 . ${SCRIPT_DIR}/functions.sh
 work_dir="$1"
 custom_install_dir="$2"
-
+parallel_install=0
 if [ -z "${work_dir}" ]; then
   work_dir="$HOME/Downloads/setupWork"
 fi
@@ -125,37 +125,41 @@ applications=(  "build-essential"
                 "firmware-linux"
 )
 
-
+if [ "$parallel_install" = "1" ]; then
+  background_task="& pids+=($!)"
+else
+  background_task=" "
+fi
 #Quartus
-install_custom_app ${work_dir} "quartus" "$QUARTUS $custom_install_dir/intel" & pids+=($!)
+install_custom_app ${work_dir} "quartus" $QUARTUS "$custom_install_dir/intel" $background_task
 #Wine
-install_custom_app ${work_dir} "wine" $WINE "$custom_install_dir/wine" & pids+=($!)
+install_custom_app ${work_dir} "wine" $WINE "$custom_install_dir/wine" $background_task
 #steam 
-install_custom_app ${work_dir} "steam" $STEAM "$custom_install_dir/steam" & pids+=($!)
+install_custom_app ${work_dir} "steam" $STEAM "$custom_install_dir/steam" $background_task
 #Lattice diamond
-install_custom_app ${work_dir} "diamond" $DIAMOND "$HOME/tools/lscc" & pids+=($!)
+install_custom_app ${work_dir} "diamond" $DIAMOND "$HOME/tools/lscc" $background_task
 #LTspiceXVII
-install_custom_app ${work_dir} "LTspice" $LTspice "$HOME/tools/LTspiceXVII" & pids+=($!)
+install_custom_app ${work_dir} "LTspice" $LTspice "$HOME/tools/LTspiceXVII" $background_task
 #DSView
-install_custom_app ${work_dir} "dsview" $DSView "$HOME/tools/dsview" & pids+=($!)
+install_custom_app ${work_dir} "dsview" $DSView "$HOME/tools/dsview" $background_task
 #Virtualbox also requires user interaction if secureboot is enabled
-install_custom_app ${work_dir} "virtualbox" $VBOX "$HOME/tools/vbox" & pids+=($!)
+install_custom_app ${work_dir} "virtualbox" $VBOX "$HOME/tools/vbox" $background_task
 #VScode
-install_custom_app ${work_dir} "code" $CODE "$custom_install_dir/code" & pids+=($!)
+install_custom_app ${work_dir} "code" $CODE "$custom_install_dir/code" $background_task
 #miniconda
-install_custom_app ${work_dir} "miniconda" $MINICONDA "$HOME/tools/miniconda3" & pids+=($!)
+install_custom_app ${work_dir} "miniconda" $MINICONDA "$HOME/tools/miniconda3" $background_task
 #Docker
-install_custom_app ${work_dir} "docker" $DOCKER "$HOME/tools/docker" & pids+=($!)
+install_custom_app ${work_dir} "docker" $DOCKER "$HOME/tools/docker" $background_task
 #Vivado
-install_custom_app ${work_dir} "vivado" $VIVADO "$HOME/tools/xilinx" & pids+=($!)
+install_custom_app ${work_dir} "vivado" $VIVADO "$HOME/tools/xilinx" $background_task
 #Prusa Slic3r
-install_custom_app ${work_dir} "prusasclic3r" $PrusaSlicer "$HOME/tools/prusa" & pids+=($!)
+install_custom_app ${work_dir} "prusasclic3r" $PrusaSlicer "$HOME/tools/prusa" $background_task
 #Arduino
-install_custom_app ${work_dir} "arduino" $ARDUINO "$HOME/tools/arduino" & pids+=($!)
+install_custom_app ${work_dir} "arduino" $ARDUINO "$HOME/tools/arduino" $background_task
 #obsidian
-install_custom_app ${work_dir} "obsidian" $OBSIDIAN "$HOME/tools/obsidian" & pids+=($!)
+install_custom_app ${work_dir} "obsidian" $OBSIDIAN "$HOME/tools/obsidian" $background_task
 #obsidian
-install_custom_app ${work_dir} "dash2dock" $DASH2DOCK "$HOME/tools/dash2dock" & pids+=($!)
+install_custom_app ${work_dir} "dash2dock" $DASH2DOCK "$HOME/tools/dash2dock" $background_task
 
 ##########################################
 ###CUSTOMIZE THE OS
