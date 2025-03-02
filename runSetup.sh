@@ -7,11 +7,11 @@
 #CUSTOMIZE SPECIAL APPs
 ######################################
 QUARTUS=0
-WINE=1
-STEAM=1
-DIAMOND=1
-LTspice=1
-VBOX=1
+WINE=0
+STEAM=0
+DIAMOND=0
+LTspice=0
+VBOX=0
 DSView=1
 CODE=1
 MINICONDA=1
@@ -153,7 +153,7 @@ install_custom_app ${work_dir} "docker" $DOCKER "$HOME/tools/docker" $background
 #Vivado
 install_custom_app ${work_dir} "vivado" $VIVADO "$HOME/tools/xilinx" $background_task
 #Prusa Slic3r
-install_custom_app ${work_dir} "prusasclic3r" $PrusaSlicer "$HOME/tools/prusa" $background_task
+install_custom_app ${work_dir} "prusaslic3r" $PrusaSlicer "$HOME/tools/prusa" $background_task
 #Arduino
 install_custom_app ${work_dir} "arduino" $ARDUINO "$HOME/tools/arduino" $background_task
 #obsidian
@@ -187,7 +187,7 @@ set_custom_keybinding "custom4" "Set Monitors" "$HOME/Nextcloud/Documents/Projek
 #Customize Gnome
 gsettings set org.gnome.SessionManager logout-prompt false
 gsettings set org.gnome.shell.extensions.ding show-home false
-if [ "$(DISTRO_ID)" = "Ubuntu" ]; then
+if [ "$DISTRO_ID" = "Ubuntu" ]; then
   gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'BOTTOM'
   gsettings set org.gnome.shell.extensions.dash-to-dock extend-height false
 fi

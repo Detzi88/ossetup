@@ -111,6 +111,27 @@ set_custom_keybinding() {
     fi
 }
 
+apt_concurrent_install() {
+    package-name=$1
+    logfile=./logs/$package.log
+    RETRY_TIMEOUT=5
+    
+    while ! sudo apt-get -o DPkg::Lock::Timeout=3600 install $package 2>&1 -y | tee $logfile ; do 
+        if grep -q "Unable to locate package" $logfile || grep -q "No installation candidate" $logfile; then
+            echo -e "${RED}E:${RESETCOLOR} Package $package not found. Exiting."
+            exit 1
+        fi
+        sleep $RETRY_TIMEOUT 
+    done 
+}
+
+apt_concurrent_update(){
+    RETRY_TIMEOUT=5
+    while ! sudo apt-get -o DPkg::Lock::Timeout=3600 update; do
+        sleep $RETRY_TIMEOUT
+    done
+}
+
 install_custom_app() {
 	if [ "$#" -lt 3 ]; then
         	echo "Usage: install_custom_app <work_dir 'Path'> <name 'string'> <install '0/1'> optional: <target 'Path'>"
@@ -132,10 +153,8 @@ install_custom_app() {
         echo -e "Installing ${CYAN}$NAME${RESETCOLOR} ${GREEN}done${RESETCOLOR}."
     elif [[ "$INSTALL" == "0" ]]; then
 	    echo -e "${YELLOW}Skipping${RESETCOLOR} ${CYAN}${NAME}${RESETCOLOR}.It is not selected. \$INSTALL=$INSTALL"
-    elif [[ -z ./apps/$NAME.sh ]]; then
-	    echo -e "${YELLOW}Skipping${RESETCOLOR} ${CYAN}${NAME}${RESETCOLOR}. ./apps/$NAME.sh does not exist."
 	else
-	    echo -e "${YELLOW}Skipping${RESETCOLOR} ${CYAN}${NAME}${RESETCOLOR}. Unknowen Issue"
+	    echo -e "${YELLOW}Skipping${RESETCOLOR} ${CYAN}${NAME}${RESETCOLOR}. ./apps/$NAME.sh does not exist."
 	fi
 }
 
@@ -154,15 +173,11 @@ log_and_install() {
     done
 
     if [ "$UPDATE" = "1" ]; then
-        while ! sudo apt-get -o DPkg::Lock::Timeout=3600 update; do
-        sleep $RETRY_TIMEOUT
-        done
+        apt_concurrent_update
     fi
-        
-    echo "installing $1" >> deblog.log
-    while ! sudo apt-get -o DPkg::Lock::Timeout=3600 install "$1" -y >>./logs/$1.log 2>&1 ; do 
-        sleep $RETRY_TIMEOUT 
-    done 
+    
+    echo "installing $1" >> ./logs/packages.log
+    apt_concurrent_install "$1"
 }
 
 install_deb_package() {
