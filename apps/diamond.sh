@@ -9,8 +9,9 @@ if [ "$(uname -m)" = "aarch64" ]; then
     exit 1
 fi
 if [ -z "$workdir" ]; then
-    workdir="./work"
+    workdir="${SCRIPT_DIR}/diamondwork"
 fi
+mkdir -p ${workdir}
 #Put this into the same path as the downloaded .rpm file.
 #adjust the two following parameters as needed:
 # Define install path
@@ -27,16 +28,15 @@ lattice_encryption_link="https://www.latticesemi.com/-/media/LatticeSemi/Documen
 mico_system_link="https://files.latticesemi.com/Diamond/3.13/lms_1_2_for_diamond3_13.rpm"
 curl_header="User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36"
 current_dir=$PWD
-mkdir -p $workdir
-cd $workdir
+cd ${workdir}
 log_and_install curl
-curl -o diamond_base.rpm -L $lattice_file_link > /dev/null 2>&1 &
+curl -o ${workdir}/diamond_base.rpm -L $lattice_file_link > /dev/null 2>&1 &
 DMD_CURL_PID=$!
 
-curl -o encryption_pack.rpm -L -H "$curl_header" "$lattice_encryption_link" > /dev/null 2>&1 &
+curl -o ${workdir}/encryption_pack.rpm -L -H "$curl_header" "$lattice_encryption_link" > /dev/null 2>&1 &
 ENC_CURL_PID=$!
 
-curl -o lms.rpm -L -H "$curl_header" "$mico_system_link" > /dev/null 2>&1 &
+curl -o ${workdir}/lms.rpm -L -H "$curl_header" "$mico_system_link" > /dev/null 2>&1 &
 LMS_CURL_PID=$!
 
 # If downloading does not work, copy stuff. This requires the needed binarys in a "binarys" folder next to this script
@@ -44,7 +44,7 @@ LMS_CURL_PID=$!
 #cp  ./binarys/diamond_3_13-encryption_security-56-2-x86_64-linux.rpm encryption_pack.rpm
 $SUDO dpkg --add-architecture i386
 #nedded for installing
-log_and_install rpm2cpio --noupdate
+log_and_install rpm2cpio 
 log_and_install cpio --noupdate
 log_and_install libusb-0.1-4 --noupdate
 log_and_install rpm --noupdate
@@ -87,11 +87,11 @@ Categories=Electronics;
 "
 
 #Install Diamond
-mkdir diamond
+mkdir ${workdir}/diamond
 wait $DMD_CURL_PID
 mv diamond_base.rpm diamond
-cd diamond
-postinst_script="postinst.sh"
+cd ${workdir}/diamond
+postinst_script="${workdir}/diamond/postinst.sh"
 # Make sure the postinst.sh is empty or create it if it doesn't exist
 > "$postinst_script"
 rpm2cpio *.rpm | cpio -idmv
@@ -100,18 +100,18 @@ export RPM_INSTALL_PREFIX="$(pwd)/usr/local"
 # Make postinst.sh executable
 chmod +x "$postinst_script"
 # Run postinst.sh
-./"$postinst_script"
+"$postinst_script"
 mkdir -p "$install_dir"
 # Perform the copy operation using the install_dir variable
 cp -Rva --no-preserve=ownership ./usr/local/diamond "$install_dir"
-cd ..
-rm -R diamond
+cd ${workdir}
+rm -R ${workdir}/diamond
 
 # Install the enryption pack
-mkdir diamond
+mkdir ${workdir}/diamond
 wait $ENC_CURL_PID
 mv encryption_pack.rpm diamond
-cd diamond
+cd ${workdir}/diamond
 rpm2cpio *.rpm | cpio -idmv
 export RPM_INSTALL_PREFIX="$(pwd)/usr/local"
 cp -p -f ${RPM_INSTALL_PREFIX}/diamond/${lattice_version}/encryption_security/bin/lin64/* ${install_dir}/diamond/${lattice_version}/bin/lin64
@@ -119,8 +119,8 @@ cp -p -f ${RPM_INSTALL_PREFIX}/diamond/${lattice_version}/encryption_security/is
 cp -p -f ${RPM_INSTALL_PREFIX}/diamond/${lattice_version}/encryption_security/ispfpga/mg5a00/bin/lin64/libm5abs.so ${install_dir}/diamond/${lattice_version}/ispfpga/mg5a00/bin/lin64
 cp -r -p -f ${RPM_INSTALL_PREFIX}/diamond/${lattice_version}/encryption_security/ispfpga/ep5a00s ${install_dir}/diamond/${lattice_version}/ispfpga
 cp -r -p -f ${RPM_INSTALL_PREFIX}/diamond/${lattice_version}/encryption_security/ispfpga/ep5m00s ${install_dir}/diamond/${lattice_version}/ispfpga
-cd ..
-rm -R diamond
+cd ${workdir}
+rm -R ${workdir}/diamond
 
 # Install LMS
 # Define the content of the .desktop file, using install_dir for the Exec path
@@ -135,10 +135,10 @@ Icon=$install_dir/diamond/$lattice_version/docs/webhelp/eng/connect/Lattice_Icon
 Categories=Electronics;
 "
 /home/z004kw1n/tools/lscc/latticemicosystem/3.13/lm/micosystem/LatticeMicoLauncher
-mkdir diamond 
+mkdir ${workdir}/diamond 
 wait $LMS_CURL_PID
-mv lms.rpm diamond
-cd diamond
+mv lms.rpm ${workdir}/diamond
+cd ${workdir}/diamond
 rpm2cpio *.rpm | cpio -idmv
 export RPM_INSTALL_PREFIX="$(pwd)/usr/local"
 /bin/sed -e "s?Root=.*?Root=${install_dir}/latticemicosystem/${lattice_version}?" ${RPM_INSTALL_PREFIX}/latticemicosystem/${lattice_version}/lm/micosystem/mico32system.ini > ${RPM_INSTALL_PREFIX}/latticemicosystem/${lattice_version}/lm/micosystem/latticemicosystem.ini
@@ -146,7 +146,7 @@ rm -f ${RPM_INSTALL_PREFIX}/latticemicosystem/${lattice_version}/micosystem/mico
 chmod -f 755 ${RPM_INSTALL_PREFIX}/latticemicosystem/${lattice_version}/micosystem/latticemicosystem.ini
 cp -p -f -r ${RPM_INSTALL_PREFIX}/latticemicosystem/${lattice_version}/lm/* ${install_dir}/diamond/${lattice_version}
 cd ..
-rm -R diamond
+rm -R ${workdir}/diamond
 
 # Echo the content to the .desktop file
 echo "$desktop_file_content" > "$desktop_file"

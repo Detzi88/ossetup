@@ -6,17 +6,17 @@
 ######################################
 #CUSTOMIZE SPECIAL APPs
 ######################################
-QUARTUS=0
+QUARTUS=1
 WINE=1
 STEAM=1
-DIAMOND=0
-LTspice=0
-VBOX=0
-DSView=0
+DIAMOND=1
+LTspice=1
+VBOX=1
+DSView=1
 CODE=1
 MINICONDA=1
 DOCKER=1
-VIVADO=0
+VIVADO=1
 PrusaSlicer=1
 ARDUINO=1
 OBSIDIAN=1
@@ -216,7 +216,7 @@ sudo apt-get -o DPkg::Lock::Timeout=3600 remove nvidia* -y > /dev/null
 sudo apt-get -o DPkg::Lock::Timeout=3600 autoremove -y > /dev/null
 
 #echo "Installing missing drivers:"
-if [ "$(DISTRO_ID)" = "Ubuntu" ]; then
+if [ "$DISTRO_ID" = "Ubuntu" ]; then
   sudo ubuntu-drivers autoinstall
 fi
 
