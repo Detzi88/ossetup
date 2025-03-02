@@ -112,7 +112,7 @@ set_custom_keybinding() {
 }
 
 apt_concurrent_install() {
-    package-name=$1
+    package=$1
     logfile=./logs/$package.log
     RETRY_TIMEOUT=5
     
@@ -187,6 +187,7 @@ install_deb_package() {
         echo "Usage: install_deb_package <download_link>"
         return 1
     fi
+    log_and_install curl
     # Assign the first argument to a variable
     local download_link=${1}
     domain=$(echo ${download_link} | awk -F[/:] '{print $4}')
