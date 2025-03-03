@@ -187,7 +187,6 @@ set_custom_keybinding "custom4" "Set Monitors" "$HOME/Nextcloud/Documents/Projek
 #Customize Gnome
 gsettings set org.gnome.desktop.peripherals.mouse double-click 400
 gsettings set org.gnome.SessionManager logout-prompt false
-gsettings set org.gnome.shell.extensions.ding show-home false
 gsettings set org.gnome.desktop.session idle-delay uint32 480
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 1800
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-timeout 1200
@@ -196,6 +195,7 @@ gsettings set org.gnome.desktop.interface show-battery-percentage true
 if [ "$DISTRO_ID" = "Ubuntu" ]; then
   gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'BOTTOM'
   gsettings set org.gnome.shell.extensions.dash-to-dock extend-height false
+  gsettings set org.gnome.shell.extensions.ding show-home false
 fi
 gsettings set org.gnome.desktop.notifications show-banners false
 gsettings set org.gnome.shell favorite-apps "['firefox-esr.desktop', 'org.gnome.Nautilus.desktop']"
