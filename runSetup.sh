@@ -184,10 +184,10 @@ set_custom_keybinding "custom2" "Firefox" "firefox" "<Super>f"
 set_custom_keybinding "custom3" "Nautilus" "nautilus" "<Super>x"
 set_custom_keybinding "custom4" "Set Monitors" "$HOME/Nextcloud/Documents/Projekte/LinuxSetup/Setup/monitors/hdmi-mirror.sh" "<Super>d"
 
-#Customize Gnome
+#Customize Gnomegsettings set org.gnome.desktop.session idle-delay uint32 480
 gsettings set org.gnome.desktop.peripherals.mouse double-click 400
 gsettings set org.gnome.SessionManager logout-prompt false
-gsettings set org.gnome.desktop.session idle-delay uint32 480
+gsettings set org.gnome.desktop.session idle-delay 480
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 1800
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-timeout 1200
 gsettings set org.gnome.desktop.interface show-battery-percentage true
@@ -222,7 +222,7 @@ sudo usermod -a -G plugdev $USER
 ### Install my Applications
 RETRY_TIMEOUT=5
 while ! sudo apt-get -o DPkg::Lock::Timeout=3600 update > /dev/null ; do #update the package lists
-  sleep $RETRY_TIMEOUT RETRY_TIMEOUT=5
+  sleep $RETRY_TIMEOUT
 done 
 
 while ! sudo apt-get -o DPkg::Lock::Timeout=3600 upgrade -y > /dev/null ; do  #install updates
