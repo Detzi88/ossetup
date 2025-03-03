@@ -152,7 +152,7 @@ install_custom_app() {
 	    ./apps/${NAME}.sh $work_dir $target_path >> ./logs/${NAME}.log 2>&1
         echo -e "Installing ${CYAN}$NAME${RESETCOLOR} ${GREEN}done${RESETCOLOR}."
     elif [[ "$INSTALL" == "0" ]]; then
-	    echo -e "${YELLOW}Skipping${RESETCOLOR} ${CYAN}${NAME}${RESETCOLOR}.It is not selected. \$INSTALL=$INSTALL"
+	    echo -e "${YELLOW}Skipping${RESETCOLOR} ${CYAN}${NAME}${RESETCOLOR}.It is not selected."
 	else
 	    echo -e "${YELLOW}Skipping${RESETCOLOR} ${CYAN}${NAME}${RESETCOLOR}. ./apps/$NAME.sh does not exist."
 	fi

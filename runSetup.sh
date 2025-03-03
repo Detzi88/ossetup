@@ -6,12 +6,12 @@
 ######################################
 #CUSTOMIZE SPECIAL APPs
 ######################################
-QUARTUS=0
-WINE=0
-STEAM=0
-DIAMOND=0
-LTspice=0
-VBOX=0
+QUARTUS=1
+WINE=1
+STEAM=1
+DIAMOND=1
+LTspice=1
+VBOX=1
 DSView=1
 CODE=1
 MINICONDA=1
@@ -30,7 +30,7 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 . ${SCRIPT_DIR}/functions.sh
 work_dir="$1"
 custom_install_dir="$2"
-parallel_install=0
+
 if [ -z "${work_dir}" ]; then
   work_dir="$HOME/Downloads/setupWork"
 fi
@@ -40,7 +40,7 @@ if [ -z "$custom_install_dir" ]; then
 fi
 
 #Dash 2 dock is currently the only package requirering a reboot
-if [ "$DASH2DOCK" = "1" ]; then
+if [[ $DASH2DOCK -eq 1 || $PrusaSlicer -eq 1 ]]; then
   reboot_required=true
 else
   reboot_required=false
@@ -56,6 +56,9 @@ mkdir -p "$HOME/git"
 #mkdir -p "$HOME/svn"
 mkdir -p ${SCRIPT_DIR}/logs
 
+#Disable idle sleep while installing
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'nothing'
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-type 'nothing'
 # I need curl for all the background downloads to work so install it first:
 log_and_install curl 
 
@@ -125,41 +128,38 @@ applications=(  "build-essential"
                 "firmware-linux"
 )
 
-if [ "$parallel_install" = "1" ]; then
-  background_task="& pids+=($!)"
-else
-  background_task=" "
-fi
 #Quartus
-install_custom_app ${work_dir} "quartus" $QUARTUS "$custom_install_dir/intel" $background_task
+install_custom_app ${work_dir} "quartus" $QUARTUS "$custom_install_dir/intel" & pids+=($!)
 #Wine
-install_custom_app ${work_dir} "wine" $WINE "$custom_install_dir/wine" $background_task
+install_custom_app ${work_dir} "wine" $WINE "$custom_install_dir/wine" & pids+=($!)
 #steam 
-install_custom_app ${work_dir} "steam" $STEAM "$custom_install_dir/steam" $background_task
+install_custom_app ${work_dir} "steam" $STEAM "$custom_install_dir/steam" & pids+=($!)
 #Lattice diamond
-install_custom_app ${work_dir} "diamond" $DIAMOND "$HOME/tools/lscc" $background_task
+install_custom_app ${work_dir} "diamond" $DIAMOND "$HOME/tools/lscc" & pids+=($!)
 #LTspiceXVII
-install_custom_app ${work_dir} "LTspice" $LTspice "$HOME/tools/LTspiceXVII" $background_task
+install_custom_app ${work_dir} "LTspice" $LTspice "$HOME/tools/LTspiceXVII" & pids+=($!)
 #DSView
-install_custom_app ${work_dir} "dsview" $DSView "$HOME/tools/dsview" $background_task
+install_custom_app ${work_dir} "dsview" $DSView "$HOME/tools/dsview" & pids+=($!)
 #Virtualbox also requires user interaction if secureboot is enabled
-install_custom_app ${work_dir} "virtualbox" $VBOX "$HOME/tools/vbox" $background_task
+install_custom_app ${work_dir} "virtualbox" $VBOX "$HOME/tools/vbox" & pids+=($!)
 #VScode
-install_custom_app ${work_dir} "code" $CODE "$custom_install_dir/code" $background_task
+install_custom_app ${work_dir} "code" $CODE "$custom_install_dir/code" & pids+=($!)
 #miniconda
-install_custom_app ${work_dir} "miniconda" $MINICONDA "$HOME/tools/miniconda3" $background_task
+install_custom_app ${work_dir} "miniconda" $MINICONDA "$HOME/tools/miniconda3" & pids+=($!)
 #Docker
-install_custom_app ${work_dir} "docker" $DOCKER "$HOME/tools/docker" $background_task
+install_custom_app ${work_dir} "docker" $DOCKER "$HOME/tools/docker" & pids+=($!)
 #Vivado
-install_custom_app ${work_dir} "vivado" $VIVADO "$HOME/tools/xilinx" $background_task
+install_custom_app ${work_dir} "vivado" $VIVADO "$HOME/tools/xilinx" & pids+=($!)
 #Prusa Slic3r
-install_custom_app ${work_dir} "prusaslic3r" $PrusaSlicer "$HOME/tools/prusa" $background_task
+install_custom_app ${work_dir} "prusaslic3r" $PrusaSlicer "$HOME/tools/prusa" & pids+=($!)
 #Arduino
-install_custom_app ${work_dir} "arduino" $ARDUINO "$HOME/tools/arduino" $background_task
+install_custom_app ${work_dir} "arduino" $ARDUINO "$HOME/tools/arduino" & pids+=($!)
 #obsidian
-install_custom_app ${work_dir} "obsidian" $OBSIDIAN "$HOME/tools/obsidian" $background_task
+install_custom_app ${work_dir} "obsidian" $OBSIDIAN "$HOME/tools/obsidian" & pids+=($!)
 #obsidian
-install_custom_app ${work_dir} "dash2dock" $DASH2DOCK "$HOME/tools/dash2dock" $background_task
+install_custom_app ${work_dir} "dash2dock" $DASH2DOCK "$HOME/tools/dash2dock" & pids+=($!)
+#Themes
+install_custom_app ${work_dir} "themes" $THEMES "$HOME/tools/themes" & pids+=($!)
 
 ##########################################
 ###CUSTOMIZE THE OS
@@ -185,8 +185,14 @@ set_custom_keybinding "custom3" "Nautilus" "nautilus" "<Super>x"
 set_custom_keybinding "custom4" "Set Monitors" "$HOME/Nextcloud/Documents/Projekte/LinuxSetup/Setup/monitors/hdmi-mirror.sh" "<Super>d"
 
 #Customize Gnome
+gsettings set org.gnome.desktop.peripherals.mouse double-click 400
 gsettings set org.gnome.SessionManager logout-prompt false
 gsettings set org.gnome.shell.extensions.ding show-home false
+gsettings set org.gnome.desktop.session idle-delay uint32 480
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 1800
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-timeout 1200
+gsettings set org.gnome.desktop.interface show-battery-percentage true
+
 if [ "$DISTRO_ID" = "Ubuntu" ]; then
   gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'BOTTOM'
   gsettings set org.gnome.shell.extensions.dash-to-dock extend-height false
@@ -249,7 +255,10 @@ mv $HOME/Desktop/*.desktop $desktop_file_dir/
 rm $HOME/Desktop/*
 sudo apt-get autoremove -y
 sudo apt-get -o DPkg::Lock::Timeout=3600 update
-rm -r "${work_dir}"
+sudo rm -r "${work_dir}"
+#Enable Idle Sleep
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'suspend'
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-type 'suspend'
 if [ "$reboot_required" = true ]; then
     sudo shutdown -r now
 fi
