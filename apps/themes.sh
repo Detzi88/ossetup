@@ -50,4 +50,5 @@ THEMEID=$( echo ${THEMEID}|tr -d "[]'")
 gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:${THEMEID}/ use-theme-colors false
 gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:${THEMEID}/ foreground-color ${BASH_TEXT_COLOR}
 gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:${THEMEID}/ background-color ${BASH_BG_COLOR}
+sudo rm -r yaru
 
