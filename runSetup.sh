@@ -220,10 +220,22 @@ sudo usermod -a -G dialout $USER
 sudo usermod -a -G plugdev $USER
 
 ### Install my Applications
-sudo apt-get -o DPkg::Lock::Timeout=3600 update > /dev/null #update the package lists
-sudo apt-get -o DPkg::Lock::Timeout=3600 upgrade -y > /dev/null #install updates
-sudo apt-get -o DPkg::Lock::Timeout=3600 remove nvidia* -y > /dev/null
-sudo apt-get -o DPkg::Lock::Timeout=3600 autoremove -y > /dev/null
+RETRY_TIMEOUT=5
+while ! sudo apt-get -o DPkg::Lock::Timeout=3600 update > /dev/null ; do #update the package lists
+  sleep $RETRY_TIMEOUT RETRY_TIMEOUT=5
+done 
+
+while ! sudo apt-get -o DPkg::Lock::Timeout=3600 upgrade -y > /dev/null ; do  #install updates
+  sleep $RETRY_TIMEOUT 
+done 
+
+while ! sudo apt-get -o DPkg::Lock::Timeout=3600 remove nvidia* -y > /dev/null ; do 
+  sleep $RETRY_TIMEOUT 
+done 
+
+while ! sudo apt-get -o DPkg::Lock::Timeout=3600 autoremove -y > /dev/null ; do 
+  sleep $RETRY_TIMEOUT 
+done 
 
 #echo "Installing missing drivers:"
 if [ "$DISTRO_ID" = "Ubuntu" ]; then
