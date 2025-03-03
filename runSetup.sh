@@ -231,11 +231,11 @@ if [ "$DISTRO_ID" = "Ubuntu" ]; then
 fi
 
 for app in "${applications[@]}"; do
-    log_and_install "$app" --noupdate
+    log_and_install "$app" --noupdate > /dev/null
 done
 
 #remove the speech dispatcher (audio crackling issue)
-sudo apt-get remove speech-dispatcher -y > /dev/null
+sudo apt-get remove speech-dispatcher -y
 sudo systemctl disable speech-dispatcherd
 sudo systemctl disable speech-dispatcher
 sudo systemctl stop speech-dispatcherd
