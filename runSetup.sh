@@ -136,102 +136,102 @@ applications=(  "build-essential"
 
 custom_apps=()
 
-if [$QUARTUS -eq 1]; then 
+if [ $QUARTUS -eq 1 ]; then 
   source ./apps/quartus.sh
   applications+=("${quartus_deps[@]}")
   download_quartus & pids+=($!)
   custom_apps+=("quartus")
 fi
 
-if [$DIAMOND -eq 1]; then 
+if [ $DIAMOND -eq 1 ]; then 
   source ./apps/diamond.sh
   applications+=("${diamond_deps[@]}")
   download_diamond & pids+=($!)
   custom_apps+=("diamond")
 fi
 
-if [$STEAM -eq 1]; then 
+if [ $STEAM -eq 1 ]; then 
   source ./apps/steam.sh
   applications+=("${steam_deps[@]}")
-  custom_apps+="steam"
+  custom_apps+=("steam")
 fi
 
-if [$WINE -eq 1]; then 
+if [ $WINE -eq 1 ]; then 
   source ./apps/wine.sh
   applications+=("${wine_deps[@]}")
-  custom_apps+="wine"
+  custom_apps+=("wine")
 fi
 
-if [$LTspice -eq 1]; then 
+if [ $LTspice -eq 1 ]; then 
   source ./apps/LTspice.sh
   applications+=("${LTspice_deps[@]}")
-  custom_apps+="LTspice"
+  custom_apps+=("LTspice")
 fi
 
-if [$DSView -eq 1]; then 
+if [ $DSView -eq 1 ]; then 
   source ./apps/dsview.sh
   applications+=("${dsview_deps[@]}")
-  custom_apps+="dsview"
+  custom_apps+=("dsview")
 fi
 
-if [$VBOX -eq 1]; then 
+if [ $VBOX -eq 1 ]; then 
   source ./apps/virtualbox.sh
   applications+=("${virtualbox_deps[@]}")
-  custom_apps+="virtualbox"
+  custom_apps+=("virtualbox")
 fi
 
-if [$CODE -eq 1]; then 
+if [ $CODE -eq 1 ]; then 
   source ./apps/code.sh
   applications+=("${code_deps[@]}")
-  custom_apps+="code"
+  custom_apps+=("code")
 fi
 
-if [$MINICONDA -eq 1]; then 
+if [ $MINICONDA -eq 1 ]; then 
   source ./apps/miniconda.sh
   applications+=("${miniconda_deps[@]}")
-  custom_apps+="miniconda"
+  custom_apps+=("miniconda")
 fi
 
-if [$DOCKER -eq 1]; then 
+if [ $DOCKER -eq 1 ]; then 
   source ./apps/docker.sh
   applications+=("${docker_deps[@]}")
-  custom_apps+="docker"
+  custom_apps+=("docker")
 fi
 
-if [$VIVADO -eq 1]; then 
+if [ $VIVADO -eq 1 ]; then 
   source ./apps/vivado.sh
   applications+=("${vivado_deps[@]}")
-  custom_apps+="vivado"
+  custom_apps+=("vivado")
 fi
 
-if [$PrusaSlicer -eq 1]; then 
+if [ $PrusaSlicer -eq 1 ]; then 
   source ./apps/prusaslic3r.sh
   applications+=("${prusaslic3r_deps[@]}")
-  custom_apps+="prusaslic3r"
+  custom_apps+=("prusaslic3r")
 fi
 
-if [$ARDUINO -eq 1]; then 
+if [ $ARDUINO -eq 1 ]; then 
   source ./apps/arduino.sh
   applications+=("${arduino_deps[@]}")
-  custom_apps+="arduino"
+  custom_apps+=("arduino")
 fi
 
-if [$OBSIDIAN -eq 1]; then 
+if [ $OBSIDIAN -eq 1 ]; then 
   source ./apps/obsidian.sh
   applications+=("${obsidian_deps[@]}")
-  custom_apps+="obsidian"
+  custom_apps+=("obsidian")
 fi
 
-if [$DASH2DOCK -eq 1]; then 
+if [ $DASH2DOCK -eq 1 ]; then 
   source ./apps/dash2dock.sh
   applications+=("${dash2dock_deps[@]}")
-  custom_apps+="dash2dock"
+  custom_apps+=("dash2dock")
 fi
 
-if [$THEMES -eq 1]; then 
+if [ $THEMES -eq 1 ]; then 
   source ./apps/themes.sh
   applications+=("${themes_deps[@]}")
-  custom_apps+="themes"
+  custom_apps+=("themes")
 fi
 
 ##########################################
@@ -303,8 +303,12 @@ if [ "$DISTRO_ID" = "Ubuntu" ]; then
   sudo ubuntu-drivers autoinstall
 fi
 
-for app in "${applications[@]}"; do
+applications_sorted=($(printf "%s\n" "${applications[@]}" | sort -u))
+echo $applications_sorted
+
+for app in "${applications_sorted[@]}"; do
     sudo apt install "$app" -y
+    echo $app
 done
 
 #remove the speech dispatcher (audio crackling issue)
@@ -323,8 +327,8 @@ for pid in "${pids[@]}"; do
 done
 
 for app in "${custom_apps[@]}"; do
-    echo "install_${app}"
-    #install_${app}
+    #echo "install_${app}"
+    install_${app}
 done
 ##########################################
 ### CLEANUP
@@ -340,5 +344,5 @@ sudo rm -r "${work_dir}"
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'suspend'
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-type 'suspend'
 if [ "$reboot_required" = true ]; then
-    sudo shutdown -r now
+    #sudo shutdown -r now
 fi
