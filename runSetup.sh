@@ -66,6 +66,7 @@ gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'no
 
 # I need curl for all the background downloads to work so install it first:
 log_and_install curl 
+sudo dpkg --add-architecture i386
 
 applications=(  "build-essential" 
                 "net-tools" 
@@ -133,38 +134,105 @@ applications=(  "build-essential"
                 "firmware-linux"
 )
 
-#Quartus & pids+=($!)
-install_custom_app ${work_dir} "quartus" $QUARTUS "$custom_install_dir/intel" 
-#Wine
-install_custom_app ${work_dir} "wine" $WINE "$custom_install_dir/wine"
-#steam 
-install_custom_app ${work_dir} "steam" $STEAM "$custom_install_dir/steam"
-#Lattice diamond
-install_custom_app ${work_dir} "diamond" $DIAMOND "$HOME/tools/lscc"
-#LTspiceXVII
-install_custom_app ${work_dir} "LTspice" $LTspice "$HOME/tools/LTspiceXVII"
-#DSView
-install_custom_app ${work_dir} "dsview" $DSView "$HOME/tools/dsview"
-#Virtualbox also requires user interaction if secureboot is enabled
-install_custom_app ${work_dir} "virtualbox" $VBOX "$HOME/tools/vbox"
-#VScode
-install_custom_app ${work_dir} "code" $CODE "$custom_install_dir/code"
-#miniconda
-install_custom_app ${work_dir} "miniconda" $MINICONDA "$HOME/tools/miniconda3"
-#Docker
-install_custom_app ${work_dir} "docker" $DOCKER "$HOME/tools/docker"
-#Vivado
-install_custom_app ${work_dir} "vivado" $VIVADO "$HOME/tools/xilinx"
-#Prusa Slic3r
-install_custom_app ${work_dir} "prusaslic3r" $PrusaSlicer "$HOME/tools/prusa"
-#Arduino
-install_custom_app ${work_dir} "arduino" $ARDUINO "$HOME/tools/arduino"
-#obsidian
-install_custom_app ${work_dir} "obsidian" $OBSIDIAN "$HOME/tools/obsidian"
-#obsidian
-install_custom_app ${work_dir} "dash2dock" $DASH2DOCK "$HOME/tools/dash2dock"
-#Themes
-install_custom_app ${work_dir} "themes" $THEMES "$HOME/tools/themes"
+custom_apps=()
+
+if [$QUARTUS -eq 1]; then 
+  source ./apps/quartus.sh
+  applications+=("${quartus_deps[@]}")
+  download_quartus & pids+=($!)
+  custom_apps+=("quartus")
+fi
+
+if [$DIAMOND -eq 1]; then 
+  source ./apps/diamond.sh
+  applications+=("${diamond_deps[@]}")
+  download_diamond & pids+=($!)
+  custom_apps+=("diamond")
+fi
+
+if [$STEAM -eq 1]; then 
+  source ./apps/steam.sh
+  applications+=("${steam_deps[@]}")
+  custom_apps+="steam"
+fi
+
+if [$WINE -eq 1]; then 
+  source ./apps/wine.sh
+  applications+=("${wine_deps[@]}")
+  custom_apps+="wine"
+fi
+
+if [$LTspice -eq 1]; then 
+  source ./apps/LTspice.sh
+  applications+=("${LTspice_deps[@]}")
+  custom_apps+="LTspice"
+fi
+
+if [$DSView -eq 1]; then 
+  source ./apps/dsview.sh
+  applications+=("${dsview_deps[@]}")
+  custom_apps+="dsview"
+fi
+
+if [$VBOX -eq 1]; then 
+  source ./apps/virtualbox.sh
+  applications+=("${virtualbox_deps[@]}")
+  custom_apps+="virtualbox"
+fi
+
+if [$CODE -eq 1]; then 
+  source ./apps/code.sh
+  applications+=("${code_deps[@]}")
+  custom_apps+="code"
+fi
+
+if [$MINICONDA -eq 1]; then 
+  source ./apps/miniconda.sh
+  applications+=("${miniconda_deps[@]}")
+  custom_apps+="miniconda"
+fi
+
+if [$DOCKER -eq 1]; then 
+  source ./apps/docker.sh
+  applications+=("${docker_deps[@]}")
+  custom_apps+="docker"
+fi
+
+if [$VIVADO -eq 1]; then 
+  source ./apps/vivado.sh
+  applications+=("${vivado_deps[@]}")
+  custom_apps+="vivado"
+fi
+
+if [$PrusaSlicer -eq 1]; then 
+  source ./apps/prusaslic3r.sh
+  applications+=("${prusaslic3r_deps[@]}")
+  custom_apps+="prusaslic3r"
+fi
+
+if [$ARDUINO -eq 1]; then 
+  source ./apps/arduino.sh
+  applications+=("${arduino_deps[@]}")
+  custom_apps+="arduino"
+fi
+
+if [$OBSIDIAN -eq 1]; then 
+  source ./apps/obsidian.sh
+  applications+=("${obsidian_deps[@]}")
+  custom_apps+="obsidian"
+fi
+
+if [$DASH2DOCK -eq 1]; then 
+  source ./apps/dash2dock.sh
+  applications+=("${dash2dock_deps[@]}")
+  custom_apps+="dash2dock"
+fi
+
+if [$THEMES -eq 1]; then 
+  source ./apps/themes.sh
+  applications+=("${themes_deps[@]}")
+  custom_apps+="themes"
+fi
 
 ##########################################
 ###CUSTOMIZE THE OS
@@ -225,22 +293,10 @@ sudo usermod -a -G dialout $USER
 sudo usermod -a -G plugdev $USER
 
 ### Install my Applications
-RETRY_TIMEOUT=5
-while ! sudo apt-get -o DPkg::Lock::Timeout=3600 update > /dev/null ; do #update the package lists
-  sleep $RETRY_TIMEOUT
-done 
-
-while ! sudo apt-get -o DPkg::Lock::Timeout=3600 upgrade -y > /dev/null ; do  #install updates
-  sleep $RETRY_TIMEOUT 
-done 
-
-while ! sudo apt-get -o DPkg::Lock::Timeout=3600 remove nvidia* -y > /dev/null ; do 
-  sleep $RETRY_TIMEOUT 
-done 
-
-while ! sudo apt-get -o DPkg::Lock::Timeout=3600 autoremove -y > /dev/null ; do 
-  sleep $RETRY_TIMEOUT 
-done 
+sudo apt-get update
+sudo apt-get upgrade -y 
+sudo apt-get remove nvidia*
+sudo apt-get autoremove
 
 #echo "Installing missing drivers:"
 if [ "$DISTRO_ID" = "Ubuntu" ]; then
@@ -248,7 +304,7 @@ if [ "$DISTRO_ID" = "Ubuntu" ]; then
 fi
 
 for app in "${applications[@]}"; do
-    log_and_install "$app" --noupdate > /dev/null
+    sudo apt install "$app" -y
 done
 
 #remove the speech dispatcher (audio crackling issue)
@@ -259,19 +315,26 @@ sudo systemctl stop speech-dispatcherd
 sudo systemctl stop speech-dispatcher
 
 ##########################################
-### CLEANUP
+### Install custom Apps
 ##########################################
-
-#wait for the spawned tasks to finish:
+#wait for the downloads to finish:
 for pid in "${pids[@]}"; do
     wait "$pid"
 done
+
+for app in "${custom_apps[@]}"; do
+    echo "install_${app}"
+    #install_${app}
+done
+##########################################
+### CLEANUP
+##########################################
 #Move all shortcuts to their proper location and then clean up
 chmod +x $HOME/Desktop/*.desktop
 mv $HOME/Desktop/*.desktop $desktop_file_dir/
 rm $HOME/Desktop/*
 sudo apt-get autoremove -y
-sudo apt-get -o DPkg::Lock::Timeout=3600 update
+sudo apt-get update
 sudo rm -r "${work_dir}"
 #Enable Idle Sleep
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'suspend'
