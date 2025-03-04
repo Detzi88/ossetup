@@ -59,6 +59,11 @@ mkdir -p ${SCRIPT_DIR}/logs
 #Disable idle sleep while installing
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'nothing'
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-type 'nothing'
+gsettings set org.gnome.desktop.session idle-delay 0
+gsettings set org.gnome.settings-daemon.plugins.power power-saver-profile-on-low-battery false
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-type 'nothing'
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'nothing'
+
 # I need curl for all the background downloads to work so install it first:
 log_and_install curl 
 
@@ -128,38 +133,38 @@ applications=(  "build-essential"
                 "firmware-linux"
 )
 
-#Quartus
-install_custom_app ${work_dir} "quartus" $QUARTUS "$custom_install_dir/intel" & pids+=($!)
+#Quartus & pids+=($!)
+install_custom_app ${work_dir} "quartus" $QUARTUS "$custom_install_dir/intel" 
 #Wine
-install_custom_app ${work_dir} "wine" $WINE "$custom_install_dir/wine" & pids+=($!)
+install_custom_app ${work_dir} "wine" $WINE "$custom_install_dir/wine"
 #steam 
-install_custom_app ${work_dir} "steam" $STEAM "$custom_install_dir/steam" & pids+=($!)
+install_custom_app ${work_dir} "steam" $STEAM "$custom_install_dir/steam"
 #Lattice diamond
-install_custom_app ${work_dir} "diamond" $DIAMOND "$HOME/tools/lscc" & pids+=($!)
+install_custom_app ${work_dir} "diamond" $DIAMOND "$HOME/tools/lscc"
 #LTspiceXVII
-install_custom_app ${work_dir} "LTspice" $LTspice "$HOME/tools/LTspiceXVII" & pids+=($!)
+install_custom_app ${work_dir} "LTspice" $LTspice "$HOME/tools/LTspiceXVII"
 #DSView
-install_custom_app ${work_dir} "dsview" $DSView "$HOME/tools/dsview" & pids+=($!)
+install_custom_app ${work_dir} "dsview" $DSView "$HOME/tools/dsview"
 #Virtualbox also requires user interaction if secureboot is enabled
-install_custom_app ${work_dir} "virtualbox" $VBOX "$HOME/tools/vbox" & pids+=($!)
+install_custom_app ${work_dir} "virtualbox" $VBOX "$HOME/tools/vbox"
 #VScode
-install_custom_app ${work_dir} "code" $CODE "$custom_install_dir/code" & pids+=($!)
+install_custom_app ${work_dir} "code" $CODE "$custom_install_dir/code"
 #miniconda
-install_custom_app ${work_dir} "miniconda" $MINICONDA "$HOME/tools/miniconda3" & pids+=($!)
+install_custom_app ${work_dir} "miniconda" $MINICONDA "$HOME/tools/miniconda3"
 #Docker
-install_custom_app ${work_dir} "docker" $DOCKER "$HOME/tools/docker" & pids+=($!)
+install_custom_app ${work_dir} "docker" $DOCKER "$HOME/tools/docker"
 #Vivado
-install_custom_app ${work_dir} "vivado" $VIVADO "$HOME/tools/xilinx" & pids+=($!)
+install_custom_app ${work_dir} "vivado" $VIVADO "$HOME/tools/xilinx"
 #Prusa Slic3r
-install_custom_app ${work_dir} "prusaslic3r" $PrusaSlicer "$HOME/tools/prusa" & pids+=($!)
+install_custom_app ${work_dir} "prusaslic3r" $PrusaSlicer "$HOME/tools/prusa"
 #Arduino
-install_custom_app ${work_dir} "arduino" $ARDUINO "$HOME/tools/arduino" & pids+=($!)
+install_custom_app ${work_dir} "arduino" $ARDUINO "$HOME/tools/arduino"
 #obsidian
-install_custom_app ${work_dir} "obsidian" $OBSIDIAN "$HOME/tools/obsidian" & pids+=($!)
+install_custom_app ${work_dir} "obsidian" $OBSIDIAN "$HOME/tools/obsidian"
 #obsidian
-install_custom_app ${work_dir} "dash2dock" $DASH2DOCK "$HOME/tools/dash2dock" & pids+=($!)
+install_custom_app ${work_dir} "dash2dock" $DASH2DOCK "$HOME/tools/dash2dock"
 #Themes
-install_custom_app ${work_dir} "themes" $THEMES "$HOME/tools/themes" & pids+=($!)
+install_custom_app ${work_dir} "themes" $THEMES "$HOME/tools/themes"
 
 ##########################################
 ###CUSTOMIZE THE OS
