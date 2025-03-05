@@ -6,12 +6,12 @@ download_quartus(){
     custom_install_dir="$2"
     quartus_installer="https://downloads.intel.com/akdlm/software/acdsinst/23.1std.1/993/ib_tar/Quartus-lite-23.1std.1.993-linux.tar"
     if [ -z "$work_dir" ]; then
-        work_dir="./work"
+        work_dir="./intelwork"
     fi
     if [ -z "$custom_install_dir" ]; then
         custom_install_dir="$HOME/tools/quartus"
     fi
-    mkdir "$work_dir/intel"
+    mkdir -p "$work_dir/intel"
     curl -o "$work_dir/quartus.tar" -L $quartus_installer > /dev/null 2>&1 
 }
 
@@ -19,7 +19,7 @@ install_quartus(){
     work_dir="$1"
     custom_install_dir="$2"
     if [ -z "$work_dir" ]; then
-        work_dir="./work"
+        work_dir="$HOME/intelwork"
     fi
     if [ -z "$custom_install_dir" ]; then
         custom_install_dir="$HOME/tools/quartus"

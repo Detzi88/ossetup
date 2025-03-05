@@ -15,7 +15,7 @@ download_diamond(){
         exit 1
     fi
     if [ -z "$workdir" ]; then
-        workdir="${SCRIPT_DIR}/diamondwork"
+        workdir="${HOME}/diamondwork"
     fi
     mkdir -p ${workdir}
     lattice_file_link="https://files.latticesemi.com/Diamond/3.13/diamond_3_13-base-56-2-x86_64-linux.rpm"
@@ -51,7 +51,7 @@ install_diamond(){
         exit 1
     fi
     if [ -z "$workdir" ]; then
-        workdir="${SCRIPT_DIR}/diamondwork"
+        workdir="${HOME}/diamondwork"
     fi
     mkdir -p ${workdir}
     #Put this into the same path as the downloaded .rpm file.
