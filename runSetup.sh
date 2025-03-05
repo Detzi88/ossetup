@@ -39,6 +39,7 @@ if [ -z "$custom_install_dir" ]; then
   custom_install_dir="/home/$USER/tools"
 fi
 
+mkdir -p $work_dir
 cd $work_dir
 #Dash 2 dock is currently the only package requirering a reboot
 if [[ $DASH2DOCK -eq 1 || $PrusaSlicer -eq 1 ]]; then
