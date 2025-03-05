@@ -67,7 +67,7 @@ gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-typ
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'nothing'
 
 # I need curl for all the background downloads to work so install it first:
-sudo apt install curl -y >> ${SCRIPT_DIR}/logs/curl.log
+sudo apt-get install curl -y >> ${SCRIPT_DIR}/logs/curl.log
 sudo dpkg --add-architecture i386
 
 applications=(  "build-essential" 
@@ -294,7 +294,7 @@ echo "export LM_LICENSE_FILE=\"$custom_install_dir/intel/licenses/LR-182130_Lice
 sudo usermod -a -G dialout $USER
 sudo usermod -a -G plugdev $USER
 
-### Install my Applications
+### Install my Applications > /dev/null 2>&1 
 sudo apt-get update
 sudo apt-get upgrade -y 
 sudo apt-get remove nvidia*
@@ -309,7 +309,8 @@ applications_sorted=($(printf "%s\n" "${applications[@]}" | sort -u))
 echo $applications_sorted
 
 for app in "${applications_sorted[@]}"; do
-    sudo apt install "$app" -y >> ${SCRIPT_DIR}/logs/${app}.log
+    echo "Installing: ${app}"
+    sudo apt-get install "$app" -y >> ${SCRIPT_DIR}/logs/${app}.log  2>&1
 done
 
 #remove the speech dispatcher (audio crackling issue)
@@ -328,9 +329,10 @@ for pid in "${pids[@]}"; do
 done
 
 for app in "${custom_apps[@]}"; do
-    #echo "install_${app}"
-    install_${app} >> ${SCRIPT_DIR}/logs/${app}.log
+    echo "Installing: ${app}"
+    eval "install_${app} >> ${SCRIPT_DIR}/logs/${app}.log 2>&1"
 done
+
 ##########################################
 ### CLEANUP
 ##########################################
