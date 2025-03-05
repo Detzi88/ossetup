@@ -12,6 +12,6 @@ install_virtualbox(){
     fi
     install_deb_package ${VBOX_URL}
     rm "$work_dir/vbox.deb"
-    sudo usermod -a -G vboxusers $USER
+    sudo usermod -aG vboxusers $USER
 }
 

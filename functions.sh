@@ -159,27 +159,6 @@ install_custom_app() {
 }
 
 
-log_and_install() {
-   # wait_for_apt_lock
-    UPDATE=1
-    RETRY_TIMEOUT=5
-    mkdir -p ./logs
-
-    for arg in "$@"; do
-        if [ "$arg" = "--noupdate" ]; then
-            UPDATE=0
-            break  # Stop checking once found
-        fi
-    done
-
-    if [ "$UPDATE" = "1" ]; then
-        apt_concurrent_update
-    fi
-    
-    echo "installing $1" >> ./logs/packages.log
-    apt_concurrent_install "$1"
-}
-
 install_deb_package() {
     # Check if the URL is provided
     RETRY_TIMEOUT=5

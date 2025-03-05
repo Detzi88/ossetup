@@ -12,7 +12,7 @@ install_wine(){
     sudo add-apt-repository "deb http://deb.debian.org/debian $(lsb_release -sc) contrib" -y
     sudo mkdir -pm 755 /etc/apt/keyrings
     sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
-    log_and_install winehq-devel
-    log_and_install winetricks
+    sudo apt install winehq-devel -y
+    sudo apt install winetricks -y
 }
 

@@ -1,6 +1,7 @@
 #!/bin/bash
 steam_deps=("libc6:amd64" "libc6:i386" "libegl1:amd64" "libegl1:i386" "libgbm1:amd64" "libgbm1:i386" \
-            "libgl1-mesa-dri:amd64" "libgl1-mesa-dri:i386" "libgl1:amd64" "libgl1:i386" "steam-libs-amd64:amd64")
+            "libgl1-mesa-dri:amd64" "libgl1-mesa-dri:i386" "libgl1:amd64" "libgl1:i386" "steam-libs-amd64:amd64" \
+            "libxcb-xkb1:i386" "libxkbcommon-x11-0:i386" "steam-launcher" "steam-libs-i386:i386")
 
 install_steam(){
     SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"

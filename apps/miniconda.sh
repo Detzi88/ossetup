@@ -7,8 +7,12 @@ install_miniconda(){
     work_dir="$1"
     conda_prefix="$2"
     if [ -z "$work_dir" ]; then
-        work_dir="./work"
+        work_dir="$HOME/minicondawork"
     fi
+    if [ -z "$conda_prefix" ]; then
+        conda_prefix="$HOME/tools/miniconda"
+    fi
+    mkdir -p $conda_prefix
     curl https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh >> "$work_dir/mini.sh"
     chmod +x "$work_dir/mini.sh"
     sudo "$work_dir/mini.sh" -b -p $conda_prefix

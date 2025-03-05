@@ -27,11 +27,11 @@ install_docker(){
     sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
   sudo apt-get -o DPkg::Lock::Timeout=3600 update
 
-  log_and_install docker-ce --noupdate
-  log_and_install docker-ce-cli --noupdate
-  log_and_install containerd.io --noupdate
-  log_and_install docker-buildx-plugin --noupdate
-  log_and_install docker-compose-plugin --noupdate
+  sudo apt install docker-ce -y
+  sudo apt install docker-ce-cli -y
+  sudo apt install containerd.io -y
+  sudo apt install docker-buildx-plugin -y
+  sudo apt install docker-compose-plugin -y
   sudo groupadd docker
   sudo usermod -aG docker $USER
 }

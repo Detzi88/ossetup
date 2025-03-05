@@ -39,6 +39,7 @@ if [ -z "$custom_install_dir" ]; then
   custom_install_dir="/home/$USER/tools"
 fi
 
+cd $work_dir
 #Dash 2 dock is currently the only package requirering a reboot
 if [[ $DASH2DOCK -eq 1 || $PrusaSlicer -eq 1 ]]; then
   reboot_required=true
@@ -65,7 +66,7 @@ gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-typ
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'nothing'
 
 # I need curl for all the background downloads to work so install it first:
-log_and_install curl 
+sudo apt install curl -y >> ${SCRIPT_DIR}/logs/curl.log
 sudo dpkg --add-architecture i386
 
 applications=(  "build-essential" 
@@ -307,8 +308,7 @@ applications_sorted=($(printf "%s\n" "${applications[@]}" | sort -u))
 echo $applications_sorted
 
 for app in "${applications_sorted[@]}"; do
-    sudo apt install "$app" -y
-    echo $app
+    sudo apt install "$app" -y >> ${SCRIPT_DIR}/logs/${app}.log
 done
 
 #remove the speech dispatcher (audio crackling issue)
@@ -328,7 +328,7 @@ done
 
 for app in "${custom_apps[@]}"; do
     #echo "install_${app}"
-    install_${app}
+    install_${app} >> ${SCRIPT_DIR}/logs/${app}.log
 done
 ##########################################
 ### CLEANUP
@@ -343,6 +343,6 @@ sudo rm -r "${work_dir}"
 #Enable Idle Sleep
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'suspend'
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-type 'suspend'
-if [ "$reboot_required" = true ]; then
+#if [ "$reboot_required" = true ]; then
     #sudo shutdown -r now
-fi
+#fi

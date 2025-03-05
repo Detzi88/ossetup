@@ -10,11 +10,11 @@ install_themes(){
   custom_install_dir="$2"
 
   if [ -z "$work_dir" ]; then
-    work_dir="./yaruwdir"
+    work_dir="$HOME/yaruwdir"
   fi
 
   if [ -z "$custom_install_dir" ]; then
-    custom_install_dir="$HOME/tools/yaru"
+    custom_install_dir="$HOME/tools"
   fi
 
   if [ "$(DISTRO_ID)" = "Ubuntu" ]; then
