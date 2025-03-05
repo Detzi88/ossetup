@@ -18,7 +18,7 @@ install_dash2dock(){
     custom_install_dir="$HOME/tools/dash2dock"
   fi
 
-  mkdir $work_dir
+  mkdir -p $work_dir
   cd $work_dir
   EXTENSION_ID="307"  # Dash to Dock ID from GNOME Extensions website
   GNOME_VERSION=$(gnome-shell --version | awk '{print $3}')  # Get GNOME Shell version

@@ -295,10 +295,13 @@ sudo usermod -a -G dialout $USER
 sudo usermod -a -G plugdev $USER
 
 ### Install my Applications > /dev/null 2>&1 
-sudo apt-get update
-sudo apt-get upgrade -y 
-sudo apt-get remove nvidia*
-sudo apt-get autoremove
+echo "Updating System"
+sudo apt-get update > /dev/null 2>&1
+sudo apt-get upgrade -y > /dev/null 2>&1
+echo "Remove Nvidia drivers"
+sudo apt-get remove nvidia* > /dev/null 2>&1
+echo "Remove Unused packages"
+sudo apt-get autoremove > /dev/null 2>&1
 
 #echo "Installing missing drivers:"
 if [ "$DISTRO_ID" = "Ubuntu" ]; then
@@ -306,7 +309,6 @@ if [ "$DISTRO_ID" = "Ubuntu" ]; then
 fi
 
 applications_sorted=($(printf "%s\n" "${applications[@]}" | sort -u))
-echo $applications_sorted
 
 for app in "${applications_sorted[@]}"; do
     echo "Installing: ${app}"

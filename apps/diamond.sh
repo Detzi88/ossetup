@@ -85,7 +85,7 @@ install_diamond(){
     "
 
     #Install Diamond
-    mkdir ${workdir}/diamond
+    mkdir -p ${workdir}/diamond
     mv diamond_base.rpm diamond
     cd ${workdir}/diamond
     postinst_script="${workdir}/diamond/postinst.sh"
