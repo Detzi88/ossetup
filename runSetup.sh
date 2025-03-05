@@ -139,99 +139,99 @@ applications=(  "build-essential"
 custom_apps=()
 
 if [ $QUARTUS -eq 1 ]; then 
-  source ./apps/quartus.sh
+  source ${SCRIPT_DIR}/apps/quartus.sh
   applications+=("${quartus_deps[@]}")
   download_quartus & pids+=($!)
   custom_apps+=("quartus")
 fi
 
 if [ $DIAMOND -eq 1 ]; then 
-  source ./apps/diamond.sh
+  source ${SCRIPT_DIR}/apps/diamond.sh
   applications+=("${diamond_deps[@]}")
   download_diamond & pids+=($!)
   custom_apps+=("diamond")
 fi
 
 if [ $STEAM -eq 1 ]; then 
-  source ./apps/steam.sh
+  source ${SCRIPT_DIR}/apps/steam.sh
   applications+=("${steam_deps[@]}")
   custom_apps+=("steam")
 fi
 
 if [ $WINE -eq 1 ]; then 
-  source ./apps/wine.sh
+  source ${SCRIPT_DIR}/apps/wine.sh
   applications+=("${wine_deps[@]}")
   custom_apps+=("wine")
 fi
 
 if [ $LTspice -eq 1 ]; then 
-  source ./apps/LTspice.sh
+  source ${SCRIPT_DIR}/apps/LTspice.sh
   applications+=("${LTspice_deps[@]}")
   custom_apps+=("LTspice")
 fi
 
 if [ $DSView -eq 1 ]; then 
-  source ./apps/dsview.sh
+  source ${SCRIPT_DIR}/apps/dsview.sh
   applications+=("${dsview_deps[@]}")
   custom_apps+=("dsview")
 fi
 
 if [ $VBOX -eq 1 ]; then 
-  source ./apps/virtualbox.sh
+  source ${SCRIPT_DIR}/apps/virtualbox.sh
   applications+=("${virtualbox_deps[@]}")
   custom_apps+=("virtualbox")
 fi
 
 if [ $CODE -eq 1 ]; then 
-  source ./apps/code.sh
+  source ${SCRIPT_DIR}/apps/code.sh
   applications+=("${code_deps[@]}")
   custom_apps+=("code")
 fi
 
 if [ $MINICONDA -eq 1 ]; then 
-  source ./apps/miniconda.sh
+  source ${SCRIPT_DIR}/apps/miniconda.sh
   applications+=("${miniconda_deps[@]}")
   custom_apps+=("miniconda")
 fi
 
 if [ $DOCKER -eq 1 ]; then 
-  source ./apps/docker.sh
+  source ${SCRIPT_DIR}/apps/docker.sh
   applications+=("${docker_deps[@]}")
   custom_apps+=("docker")
 fi
 
 if [ $VIVADO -eq 1 ]; then 
-  source ./apps/vivado.sh
+  source ${SCRIPT_DIR}/apps/vivado.sh
   applications+=("${vivado_deps[@]}")
   custom_apps+=("vivado")
 fi
 
 if [ $PrusaSlicer -eq 1 ]; then 
-  source ./apps/prusaslic3r.sh
+  source ${SCRIPT_DIR}/apps/prusaslic3r.sh
   applications+=("${prusaslic3r_deps[@]}")
   custom_apps+=("prusaslic3r")
 fi
 
 if [ $ARDUINO -eq 1 ]; then 
-  source ./apps/arduino.sh
+  source ${SCRIPT_DIR}/apps/arduino.sh
   applications+=("${arduino_deps[@]}")
   custom_apps+=("arduino")
 fi
 
 if [ $OBSIDIAN -eq 1 ]; then 
-  source ./apps/obsidian.sh
+  source ${SCRIPT_DIR}/apps/obsidian.sh
   applications+=("${obsidian_deps[@]}")
   custom_apps+=("obsidian")
 fi
 
 if [ $DASH2DOCK -eq 1 ]; then 
-  source ./apps/dash2dock.sh
+  source ${SCRIPT_DIR}/apps/dash2dock.sh
   applications+=("${dash2dock_deps[@]}")
   custom_apps+=("dash2dock")
 fi
 
 if [ $THEMES -eq 1 ]; then 
-  source ./apps/themes.sh
+  source ${SCRIPT_DIR}/apps/themes.sh
   applications+=("${themes_deps[@]}")
   custom_apps+=("themes")
 fi
